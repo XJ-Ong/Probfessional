@@ -1,0 +1,103 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Probfessional.SiteMaster" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %>- Web Learning Application</title>
+
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>
+
+    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+</head>
+<body>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <%--Site Scripts--%>
+            </Scripts>
+        </asp:ScriptManager>
+
+        <header class="border-bottom bg-light py-3">
+            <div class="container-fluid px-4">
+                <div class="row align-items-start">
+                    <!-- === Left Column: Logo (spanning both rows) === -->
+                    <div class="col-auto d-flex flex-column align-items-center justify-content-center pe-4 border-end">
+                        <a href="Default.aspx" class="d-block text-decoration-none">
+                            <img src="Logo/probfessional-greyscale-transparent.png" alt="logo" style="height: 100px;">
+                        </a>
+                    </div>
+
+                    <!-- === Right Column: 2 stacked sections === -->
+                    <div class="col ps-4">
+                        <!-- Top Row: Title + Search -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0 fw-bold font-monospace flex-grow-1 text-center">
+                                Probfessional: Exploring Probability in Parlour Games
+                            </h4>
+                            <div class="input-group ms-3" style="width: 240px;">
+                                <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" placeholder="Search..."></asp:TextBox>
+                                <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn btn-outline-primary" />
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row: Nav + Session Buttons -->
+                        <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                            <nav class="nav">
+                                <a class="nav-link fw-semibold px-3" href="#">Home</a>
+                                <a class="nav-link fw-semibold px-3" href="#">About</a>
+                                <a class="nav-link fw-semibold px-3" href="#">Modules</a>
+                                <a class="nav-link fw-semibold px-3" href="#">Quizzes</a>
+                                <a class="nav-link fw-semibold px-3" href="#">Progress</a>
+                            </nav>
+
+                            <asp:LoginView runat="server">
+                                <AnonymousTemplate>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="btn btn-outline-secondary" />
+                                        <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" />
+                                    </div>
+                                </AnonymousTemplate>
+                                <LoggedInTemplate>
+                                    <asp:ImageButton ID="btnProfile" runat="server" ImageUrl="~/Images/user-icon.png" CssClass="rounded-circle" Width="40" Height="40" />
+                                </LoggedInTemplate>
+                            </asp:LoginView>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container body-content">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+            <hr />
+            <footer>
+                <p>&copy; <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>- Probfessional: Master Your Games</p>
+            </footer>
+        </div>
+    </form>
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/Scripts/bootstrap.js") %>
+    </asp:PlaceHolder>
+</body>
+</html>
