@@ -237,6 +237,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ImgModule\" />
     <Folder Include="Logo\" />
   </ItemGroup>
   <ItemGroup>
