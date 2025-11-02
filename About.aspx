@@ -63,7 +63,7 @@
                 <p>Kok Zhao Xiang<br />TP080473</p>
             </div>
             <div class="team-member">
-                <img src="TeamImage/ymy.png" alt="Ming Yuan" />
+                <img src="TeamImage/ymy.png" alt="Mingyuan" />
                 <p>Yang Mingyuan<br />TP080028</p>
             </div>
             <div class="team-member">
