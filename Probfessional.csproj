@@ -181,6 +181,10 @@
     <Content Include="Scripts\WebForms\WebParts.js" />
     <Content Include="Scripts\WebForms\WebUIValidation.js" />
     <Content Include="Site.Master" />
+    <Content Include="TeamImage\kzx.png" />
+    <Content Include="TeamImage\oxj.png" />
+    <Content Include="TeamImage\sbai.png" />
+    <Content Include="TeamImage\ymy.png" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />

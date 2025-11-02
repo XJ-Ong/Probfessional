@@ -64,7 +64,7 @@
                         <div class="d-flex justify-content-between align-items-center border-top pt-2">
                             <nav class="nav">
                                 <a class="nav-link fw-semibold px-3" href="#">Home</a>
-                                <a class="nav-link fw-semibold px-3" href="#">About</a>
+                                <a class="nav-link fw-semibold px-3" href="About.aspx">About</a>
                                 <a class="nav-link fw-semibold px-3" href="#">Modules</a>
                                 <a class="nav-link fw-semibold px-3" href="#">Quizzes</a>
                                 <a class="nav-link fw-semibold px-3" href="#">Progress</a>
@@ -92,7 +92,7 @@
             </asp:ContentPlaceHolder>
             <hr />
             <footer>
-                <p>&copy; <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>- Probfessional: Master Your Games</p>
+                <p>&copy; <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>- Probfessional: Web-based Learning Application</p>
             </footer>
         </div>
     </form>
