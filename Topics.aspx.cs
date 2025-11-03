@@ -20,6 +20,31 @@ namespace Probfessional
             }
         }
 
+        protected void sqlLessons_Selecting(object sender, SqlDataSourceSelectingEventArgs e)
+        {
+            // This event allows you to handle the data selection if needed
+        }
+
+        protected void rptLessons_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                // Get the lesson ID from the data item
+                if (e.Item.DataItem is DataRowView row)
+                {
+                    int lessonId = Convert.ToInt32(row["ID"]);
+                    string lessonTitle = row["Title"].ToString();
+                    
+                    // Find the anchor tag and set the URL
+                    System.Web.UI.HtmlControls.HtmlAnchor link = (System.Web.UI.HtmlControls.HtmlAnchor)e.Item.FindControl("lnkLesson");
+                    if (link != null)
+                    {
+                        link.HRef = $"Lessons.aspx?id={lessonId}";
+                    }
+                }
+            }
+        }
+
         private void LoadModuleDetails()
         {
             string moduleId = Request.QueryString["id"];
@@ -57,29 +82,6 @@ namespace Probfessional
                                 lblError.Text = "Module not found.";
                                 return;
                             }
-                        }
-                    }
-
-                    // Load lessons for this module
-                    string lessonsQuery = "SELECT ID, Title FROM Lessons WHERE ModuleID = @ModuleID";
-                    using (SqlCommand cmd = new SqlCommand(lessonsQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ModuleID", moduleId);
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
-                        {
-                            DataTable dt = new DataTable();
-                            adapter.Fill(dt);
-                            
-                            // Add Url column with links to lesson details
-                            dt.Columns.Add("Url", typeof(string));
-                            foreach (DataRow row in dt.Rows)
-                            {
-                                int lessonId = Convert.ToInt32(row["ID"]);
-                                row["Url"] = $"Lessons.aspx?id={lessonId}";
-                            }
-                            
-                            rptLessons.DataSource = dt;
-                            rptLessons.DataBind();
                         }
                     }
                 }

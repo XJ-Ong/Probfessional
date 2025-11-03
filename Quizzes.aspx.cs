@@ -32,18 +32,7 @@ namespace Probfessional
         {
             if (!IsPostBack)
             {
-                LoadModules();
-                
-                // Check if moduleId is passed in query string
-                string moduleIdParam = Request.QueryString["moduleId"];
-                if (!string.IsNullOrEmpty(moduleIdParam))
-                {
-                    if (int.TryParse(moduleIdParam, out int parsedModuleId))
-                    {
-                        ddlModules.SelectedValue = parsedModuleId.ToString();
-                        LoadQuizForModule(parsedModuleId);
-                    }
-                }
+                // This will be handled in PreRender to ensure dropdown is populated first
             }
             else
             {
@@ -51,30 +40,35 @@ namespace Probfessional
             }
         }
 
-        private void LoadModules()
+        protected void Page_PreRender(object sender, EventArgs e)
         {
-            try
+            if (!IsPostBack && ddlModules.Items.Count > 0)
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Check if moduleId is passed in query string
+                string moduleIdParam = Request.QueryString["moduleId"];
+                int selectedModuleId;
+                
+                if (!string.IsNullOrEmpty(moduleIdParam))
                 {
-                    conn.Open();
-                    string query = "SELECT ID, Title FROM Modules ORDER BY ID";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    if (int.TryParse(moduleIdParam, out selectedModuleId))
                     {
-                        ddlModules.DataSource = cmd.ExecuteReader();
-                        ddlModules.DataTextField = "Title";
-                        ddlModules.DataValueField = "ID";
-                        ddlModules.DataBind();
-                        ddlModules.Items.Insert(0, new ListItem("-- Select Module --", "0"));
+                        ddlModules.SelectedValue = selectedModuleId.ToString();
+                        LoadQuizForModule(selectedModuleId);
                     }
                 }
+                else if (ddlModules.Items.Count > 1)
+                {
+                    // Load Poker quiz by default (ModuleID = 1)
+                    ddlModules.SelectedValue = "1";
+                    LoadQuizForModule(1);
+                }
             }
-            catch (Exception ex)
-            {
-                lblValidationError.Visible = true;
-                lblValidationError.Text = "Error loading modules: " + ex.Message;
-            }
+        }
+
+        protected void ddlModules_DataBound(object sender, EventArgs e)
+        {
+            // Add default item at the beginning
+            ddlModules.Items.Insert(0, new ListItem("-- Select Module --", "0"));
         }
 
         protected void ddlModules_SelectedIndexChanged(object sender, EventArgs e)
@@ -139,7 +133,7 @@ namespace Probfessional
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = "SELECT ID, QuestionText, ChoiceA, ChoiceB, ChoiceC, ChoiceD, CorrectChoice FROM QuizQuestions WHERE QuizID = @QuizID ORDER BY ID";
+                    string query = "SELECT ID, QuestionText, ChoiceA, ChoiceB, ChoiceC, ChoiceD, CorrectChoice FROM QuizQuestion WHERE QuizID = @QuizID ORDER BY ID";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@QuizID", quizId);

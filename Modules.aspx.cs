@@ -49,7 +49,7 @@ namespace Probfessional
                                         <div class='module-body'>
                                             <h3 class='module-title'>{title}</h3>
                                             <p class='module-description'>{shortDesc}</p>
-                                            <a href='Topics.aspx?id={moduleId}' class='btn-view-module'>View Topics</a>
+                                            <a href='Topics.aspx?id={moduleId}' class='btn-view-module'>View Module</a>
                                         </div>
                                     </div>
                                 </div>";

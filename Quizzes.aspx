@@ -1,11 +1,18 @@
 ﻿<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quizzes.aspx.cs" Inherits="Probfessional.Quizzes" %>
 
 <asp:Content ID="QuizContent" ContentPlaceHolderID="MainContent" runat="server">
+    <!-- SqlDataSource for Modules -->
+    <asp:SqlDataSource ID="sqlModules" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:DefaultConnection %>"
+        SelectCommand="SELECT ID, Title FROM Modules ORDER BY ID">
+    </asp:SqlDataSource>
+
     <div class="quiz-wrapper">
         <!-- Module Selection - Outside Bar -->
         <div class="module-selector-outside">
             <label for="<%= ddlModules.ClientID %>" class="module-selector-label-outside">Select Module:</label>
-            <asp:DropDownList ID="ddlModules" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlModules_SelectedIndexChanged" CssClass="quiz-module-dropdown-outside" />
+            <asp:DropDownList ID="ddlModules" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlModules_SelectedIndexChanged" CssClass="quiz-module-dropdown-outside" 
+                DataSourceID="sqlModules" DataTextField="Title" DataValueField="ID" OnDataBound="ddlModules_DataBound" />
         </div>
 
         <!-- Quiz Title Section -->

@@ -15,6 +15,28 @@
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
+    <style>
+        /* Enhanced Navigation Styling */
+        header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-link {
+            color: #475569 !important;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            position: relative;
+        }
+        .nav-link:hover {
+            color: #1e40af !important;
+            background-color: rgba(30, 64, 175, 0.1);
+            transform: translateY(-2px);
+        }
+        .nav-link:active {
+            color: #1e40af !important;
+        }
+    </style>
+
 </head>
 <body>
     <form runat="server">
@@ -70,7 +92,7 @@
                                 <a class="nav-link fw-semibold px-3" href="Progress.aspx">Progress</a>
                             </nav>
 
-                            <div class="d-flex align-items-center gap-2" runat="server" id="divAuthButtons">
+                            <div class="d-flex align-items-center gap-3" runat="server" id="divAuthButtons">
                                 <!-- Anonymous Users -->
                                 <asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="btn btn-outline-secondary" OnClick="btnRegister_Click" />
                                 <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" OnClick="btnLogin_Click" />

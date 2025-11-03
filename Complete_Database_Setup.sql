@@ -1,103 +1,4 @@
 -- =============================================
--- Complete Database Setup Script
--- =============================================
-USE Probfessional
-GO
-
--- Drop existing tables if they exist
-IF OBJECT_ID('dbo.QuizQuestions', 'U') IS NOT NULL DROP TABLE dbo.QuizQuestions;
-IF OBJECT_ID('dbo.QuizAttempts', 'U') IS NOT NULL DROP TABLE dbo.QuizAttempts;
-IF OBJECT_ID('dbo.Quiz', 'U') IS NOT NULL DROP TABLE dbo.Quiz;
-IF OBJECT_ID('dbo.UserProgress', 'U') IS NOT NULL DROP TABLE dbo.UserProgress;
-IF OBJECT_ID('dbo.Lessons', 'U') IS NOT NULL DROP TABLE dbo.Lessons;
-IF OBJECT_ID('dbo.Modules', 'U') IS NOT NULL DROP TABLE dbo.Modules;
-IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE dbo.Users;
-GO
-
--- =============================================
--- Create Tables
--- =============================================
-
-CREATE TABLE [dbo].[Users] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [Email] NVARCHAR(255) NOT NULL UNIQUE,
-    [DisplayName] NVARCHAR(100) NOT NULL,
-    [Password] NVARCHAR(255) NOT NULL,
-    [Role] NVARCHAR(50) NOT NULL,
-    [CreatedAt] DATETIME DEFAULT GETDATE(),
-    [IsActive] BIT DEFAULT 1,
-    CHECK ([Role]='Teacher' OR [Role]='Learner' OR [Role]='Admin')
-);
-GO
-
-CREATE TABLE [dbo].[Modules] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [Title] NVARCHAR(100) NOT NULL,
-    [Slug] NVARCHAR(100) NOT NULL,
-    [Description] NVARCHAR(MAX),
-    [ImagePath] NVARCHAR(255)
-);
-GO
-
-CREATE TABLE [dbo].[Lessons] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [ModuleID] INT NOT NULL,
-    [Title] NVARCHAR(100) NOT NULL,
-    [Content] NVARCHAR(MAX),
-    [Order] INT,
-    FOREIGN KEY ([ModuleID]) REFERENCES [Modules]([ID]) ON DELETE CASCADE
-);
-GO
-
-CREATE TABLE [dbo].[Quiz] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [ModuleID] INT NOT NULL,
-    [Title] NVARCHAR(100) NOT NULL,
-    [UserID] INT NOT NULL,
-    FOREIGN KEY ([ModuleID]) REFERENCES [Modules]([ID]) ON DELETE CASCADE,
-    FOREIGN KEY ([UserID]) REFERENCES [Users]([ID]) ON DELETE CASCADE
-);
-GO
-
-CREATE TABLE [dbo].[QuizQuestions] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [QuizID] INT NOT NULL,
-    [QuestionText] NVARCHAR(MAX) NOT NULL,
-    [ChoiceA] NVARCHAR(255),
-    [ChoiceB] NVARCHAR(255),
-    [ChoiceC] NVARCHAR(255),
-    [ChoiceD] NVARCHAR(255),
-    [CorrectChoice] NCHAR(1),
-    FOREIGN KEY ([QuizID]) REFERENCES [Quiz]([ID]) ON DELETE CASCADE
-);
-GO
-
-CREATE TABLE [dbo].[QuizAttempts] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [UserID] INT NOT NULL,
-    [QuizID] INT NOT NULL,
-    [TakenTime] DATETIME DEFAULT GETDATE(),
-    [Score] DECIMAL(5,2),
-    FOREIGN KEY ([UserID]) REFERENCES [Users]([ID]) ON DELETE CASCADE,
-    FOREIGN KEY ([QuizID]) REFERENCES [Quiz]([ID]) ON DELETE CASCADE
-);
-GO
-
-CREATE TABLE [dbo].[UserProgress] (
-    [ID] INT IDENTITY(1,1) PRIMARY KEY,
-    [UserID] INT NOT NULL,
-    [ModuleID] INT NOT NULL,
-    [ProgressPercent] DECIMAL(5,2) DEFAULT 0,
-    [UpdatedAt] DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY ([UserID]) REFERENCES [Users]([ID]) ON DELETE CASCADE,
-    FOREIGN KEY ([ModuleID]) REFERENCES [Modules]([ID]) ON DELETE CASCADE
-);
-GO
-
-PRINT 'All tables created successfully!'
-GO
-
--- =============================================
 -- Insert Sample Data
 -- =============================================
 
@@ -830,20 +731,20 @@ GO
 -- Insert Quizzes
 -- =============================================
 
-INSERT INTO [dbo].[Quiz] ([ModuleID], [Title], [UserID])
+INSERT INTO [dbo].[Quiz] ([ModuleID], [Title])
 VALUES
-    (1, 'Poker Probability Quiz', 2),
-    (2, 'UNO Probability Quiz', 2),
-    (3, 'Mahjong Probability Quiz', 2),
-    (4, 'Dice Probability Quiz', 2),
-    (5, 'Slot Machines Probability Quiz', 2);
+    (1, 'Poker Probability Quiz'),
+    (2, 'UNO Probability Quiz'),
+    (3, 'Mahjong Probability Quiz'),
+    (4, 'Dice Probability Quiz'),
+    (5, 'Slot Machines Probability Quiz');
 GO
 
 -- =============================================
 -- Insert Quiz Questions
 -- =============================================
 
-INSERT INTO [QuizQuestions]
+INSERT INTO [QuizQuestion]
 ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice])
 VALUES
 (1, 'What is the probability of being dealt an Ace as your first card in a standard deck?', '1/52', '1/13', '1/26', '1/4', 'B'),
@@ -857,7 +758,7 @@ VALUES
 (1, 'What is probability dealt a straight in 5 cards?', '1/128', '1/254', '1/693', '1/10', 'B'),
 (1, 'Probability of no pairs in 5 cards?', '1/2', '1/10', '1/5', '1/3', 'A');
 
-INSERT INTO [QuizQuestions] 
+INSERT INTO [QuizQuestion] 
 ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice])
 VALUES
 (2, 'What is the chance of drawing a red card from a standard UNO deck (25 of each color in 108 total cards)?', '25/108', '1/4', '1/2', '1/8', 'A'),
@@ -871,7 +772,7 @@ VALUES
 (2, 'What is the chance the next player can play a card if only color needs to match and they have 7 cards?', '≈0.55', '≈0.65', '≈0.75', '≈0.85', 'C'),
 (2, 'UNO: If all number cards are gone, P(drawing wild)?', '8/108', '8/76', '8/100', '8/80', 'B');
 
-INSERT INTO [QuizQuestions] 
+INSERT INTO [QuizQuestion] 
 ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice])
 VALUES
 (3, 'In simplified Mahjong, what is the probability of drawing a bamboo tile from a full set of 36 bamboo, 36 character, and 36 dot tiles?', '1/2', '1/3', '1/4', '1/6', 'B'),
@@ -885,7 +786,7 @@ VALUES
 (3, 'Draw a dragon then a wind in two draws? (12/144)*(16/143)', '1/81', '1/90', '1/100', '1/120', 'B'),
 (3, 'One tile is green. Probability it''s a green dragon? (4/144)', '1/36', '1/12', '1/18', '1/48', 'A');
 
-INSERT INTO [QuizQuestions] 
+INSERT INTO [QuizQuestion] 
 ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice])
 VALUES
 (4, 'What is the probability of rolling a 6 on a fair die?', '1/2', '1/4', '1/6', '1/12', 'C'),
@@ -899,20 +800,18 @@ VALUES
 (4, 'Probability of getting a 3 prior to a 6 in repeated rolls?', '1/3', '1/2', '1/4', '1/6', 'B'),
 (4, 'You roll 3 dice. What''s the probability at least one is a 6?', '1 - (5/6)^3', '1/6', '3/6', '1/3', 'A');
 
-PRINT '======================================================='
-PRINT 'Database setup complete!'
-PRINT '======================================================='
-PRINT ''
-PRINT 'Summary of inserted data:'
-PRINT '- 3 Users (Admin, Teacher, Learner)'
-PRINT '- 5 Modules (Poker, UNO, Mahjong, Dice, Slot Machines)'
-PRINT '- 30 Lessons (6 lessons per module)'
-PRINT '- 5 Quizzes (one per module)'
-PRINT '- 50 Quiz Questions (10 per quiz)'
-PRINT ''
-PRINT 'You can now run your application and login with:'
-PRINT 'Admin: admin@gmail.com / Admin123!'
-PRINT 'Teacher: teacher@gmail.com / Teacher123!'
-PRINT 'Learner: learner@gmail.com / Learner123!'
-PRINT '======================================================='
-GO
+INSERT INTO [QuizQuestion] 
+([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice])
+VALUES
+(5, 'What is the probability of getting three cherries if each slot has 1/10 chance for cherries?', '(1/10)^3', '3/10', '1/10', '1/30', 'A'),
+(5, 'Each spin on a slot machine is independent. If a cherry appears once, what is the chance it appears in the next spin?', 'Still 1/10', '1/5', '1/20', '1', 'A'),
+(5, 'What is the probability of NOT getting a cherry (1/10 chance for cherries) in a single pull?', '9/10', '1/10', '1/5', '1/9', 'A'),
+(5, 'If there are 5 different symbols in a slot, what''s the probability of getting three of the same symbol in a row? (equal chance)', '(1/5)^3', '3/5', '1/5', '1/15', 'A'),
+(5, 'Probability of getting the bell symbol twice in two spins if P(bell)=1/20?', '(1/20)^2', '1/20', '1/10', '1/40', 'A'),
+(5, 'If chance for jackpot is 1/250, play 3 times, P(at least one jackpot)?', '1 - (249/250)^3', '(1/250)*3', '1/250', '(1/250)^3', 'A'),
+(5, 'P(cherry in first, orange in second), both P=1/10?', '(1/10)^2', '1/10', '2/10', '1/5', 'A'),
+(5, 'With 8 symbols, chance of THREE sevens in a row?', '(1/8)^3', '3/8', '1/8', '1/24', 'A'),
+(5, 'Play 10 times, never get a diamond (P=1/16) each time)?', '(15/16)^10', '(1/16)^10', '10/16', '15/16', 'A'),
+(5, 'P(bar, cherry, and orange in any order in 3 spins)?', '6*(1/10)^3', '(1/10)^3', '3*(1/10)^3', '1/10', 'A');
+
+

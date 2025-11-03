@@ -10,6 +10,16 @@
 
     <asp:Label ID="lblError" runat="server" CssClass="alert alert-danger" Visible="false" />
 
+    <!-- SqlDataSource for Lessons -->
+    <asp:SqlDataSource ID="sqlLessons" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:DefaultConnection %>"
+        SelectCommand="SELECT ID, Title FROM Lessons WHERE ModuleID = @ModuleID"
+        OnSelecting="sqlLessons_Selecting">
+        <SelectParameters>
+            <asp:QueryStringParameter Name="ModuleID" QueryStringField="id" Type="Int32" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+
     <style>
         .btn-back-modules {
             display: inline-block;
@@ -53,13 +63,13 @@
 
     <h3 style="margin-top: 32px; margin-bottom: 20px;">Topics</h3>
     
-    <asp:Repeater ID="rptLessons" runat="server">
+    <asp:Repeater ID="rptLessons" runat="server" DataSourceID="sqlLessons" OnItemDataBound="rptLessons_ItemDataBound">
         <ItemTemplate>
             <div class="card topic-card">
                 <div class="card-body">
                     <h5 class="card-title topic-title"><%# Eval("Title") %></h5>
                     <div style="margin-top: 16px;">
-                        <a href='<%# Eval("Url") %>' class="btn btn-sm btn-primary">View Topic</a>
+                        <a id="lnkLesson" runat="server" href="#" class="btn btn-sm btn-primary">View Topic</a>
                     </div>
                 </div>
             </div>

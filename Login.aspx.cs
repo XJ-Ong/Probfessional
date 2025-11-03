@@ -16,6 +16,19 @@ namespace Probfessional
             {
                 Response.Redirect("Default.aspx");
             }
+
+            if (!IsPostBack)
+            {
+                // Check for remembered credentials
+                if (Request.Cookies["RememberEmail"] != null)
+                {
+                    txtEmail.Text = Server.HtmlDecode(Request.Cookies["RememberEmail"].Value);
+                }
+                if (Request.Cookies["RememberPassword"] != null)
+                {
+                    txtPassword.Attributes["value"] = Server.HtmlDecode(Request.Cookies["RememberPassword"].Value);
+                }
+            }
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
@@ -63,6 +76,22 @@ namespace Probfessional
                                     Session["Email"] = reader["Email"].ToString();
                                     Session["DisplayName"] = reader["DisplayName"].ToString();
                                     Session["Role"] = reader["Role"].ToString();
+
+                                    // Handle Remember Me checkbox
+                                    if (chkRemember.Checked)
+                                    {
+                                        // Save credentials to cookies (30 days expiry)
+                                        Response.Cookies["RememberEmail"].Value = Server.HtmlEncode(email);
+                                        Response.Cookies["RememberEmail"].Expires = DateTime.Now.AddDays(30);
+                                        Response.Cookies["RememberPassword"].Value = Server.HtmlEncode(password);
+                                        Response.Cookies["RememberPassword"].Expires = DateTime.Now.AddDays(30);
+                                    }
+                                    else
+                                    {
+                                        // Clear cookies if Remember Me is not checked
+                                        Response.Cookies["RememberEmail"].Expires = DateTime.Now.AddDays(-1);
+                                        Response.Cookies["RememberPassword"].Expires = DateTime.Now.AddDays(-1);
+                                    }
 
                                     // Redirect based on role
                                     string role = reader["Role"].ToString();
