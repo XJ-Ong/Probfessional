@@ -26,72 +26,98 @@ namespace Probfessional
             }
 
             string email = txtEmail.Text.Trim();
-            string displayName = txtDisplayName.Text.Trim();
-            string password = txtPassword.Text;
-            string role = rbTeacher.Checked ? "Teacher" : "Learner";
-
+            
+            // Check if email already exists using 6-step pattern
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+            
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                conn.Open();
+                string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
+                SqlCommand comm = new SqlCommand(checkQuery, conn);
+                comm.Parameters.AddWithValue("@Email", email);
                 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                int count = (int)comm.ExecuteScalar();
+                
+                if (count > 0)
                 {
-                    conn.Open();
+                    lblError.Visible = true;
+                    lblError.Text = "This email is already registered. Please use a different email or login.";
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                lblError.Visible = true;
+                lblError.Text = "An error occurred while checking email. Please try again.";
+            }
+            finally
+            {
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
+            }
+
+            // Use SqlDataSource to insert new user
+            try
+            {
+                SqlDataSource1.Insert();
+            }
+            catch (Exception ex)
+            {
+                lblError.Visible = true;
+                lblError.Text = "Registration failed. Please try again.";
+            }
+        }
+
+        protected void SqlDataSource1_Inserted(object sender, SqlDataSourceStatusEventArgs e)
+        {
+            // Get the newly inserted user ID
+            string email = txtEmail.Text.Trim();
+            string displayName = txtDisplayName.Text.Trim();
+            string role = rdolRole.SelectedValue;
+            
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+            
+            try
+            {
+                conn.Open();
+                string query = "SELECT ID FROM Users WHERE Email = @Email";
+                SqlCommand comm = new SqlCommand(query, conn);
+                comm.Parameters.AddWithValue("@Email", email);
+                
+                object result = comm.ExecuteScalar();
+                if (result != null)
+                {
+                    int newUserID = Convert.ToInt32(result);
                     
-                    // Check if email already exists
-                    string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
-                    using (SqlCommand checkCmd = new SqlCommand(checkEmailQuery, conn))
+                    // Registration successful - automatically log in
+                    Session["UserID"] = newUserID.ToString();
+                    Session["Email"] = email;
+                    Session["DisplayName"] = displayName;
+                    Session["Role"] = role;
+
+                    // Redirect based on role
+                    if (role == "Teacher")
                     {
-                        checkCmd.Parameters.AddWithValue("@Email", email);
-                        int count = (int)checkCmd.ExecuteScalar();
-                        
-                        if (count > 0)
-                        {
-                            // Email already exists
-                            ClientScript.RegisterStartupScript(this.GetType(), "EmailExists", 
-                                "alert('This email is already registered. Please use a different email or login.');", true);
-                            return;
-                        }
+                        Response.Redirect("Modules.aspx");
                     }
-
-                    // Insert new user
-                    string insertQuery = @"INSERT INTO Users (Email, DisplayName, Password, Role, CreatedAt, IsActive) 
-                                         VALUES (@Email, @DisplayName, @Password, @Role, GETDATE(), 1);
-                                         SELECT SCOPE_IDENTITY();";
-                    
-                    using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                    else
                     {
-                        cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@DisplayName", displayName);
-                        cmd.Parameters.AddWithValue("@Password", password);
-                        cmd.Parameters.AddWithValue("@Role", role);
-
-                        // Get the new user ID
-                        int newUserID = Convert.ToInt32(cmd.ExecuteScalar());
-
-                        // Registration successful - automatically log in
-                        Session["UserID"] = newUserID.ToString();
-                        Session["Email"] = email;
-                        Session["DisplayName"] = displayName;
-                        Session["Role"] = role;
-
-                        // Redirect based on role
-                        if (role == "Teacher")
-                        {
-                            Response.Redirect("Modules.aspx");
-                        }
-                        else
-                        {
-                            Response.Redirect("Default.aspx");
-                        }
+                        Response.Redirect("Default.aspx");
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log error
-                ClientScript.RegisterStartupScript(this.GetType(), "RegistrationError", 
-                    "alert('Registration failed. Please try again.');", true);
+                lblError.Visible = true;
+                lblError.Text = "Registration successful but login failed. Please login manually.";
+            }
+            finally
+            {
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
     }

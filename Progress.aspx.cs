@@ -69,31 +69,37 @@ namespace Probfessional
 
         private void LoadLessonsForModule(Repeater rptLessons, int moduleId)
         {
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string query = "SELECT ID, Title, ModuleID, 0 as IsCompleted FROM Lessons WHERE ModuleID = @ModuleID ORDER BY ID";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ModuleID", moduleId);
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
-                        {
-                            DataTable dt = new DataTable();
-                            adapter.Fill(dt);
-                            rptLessons.DataSource = dt;
-                            rptLessons.DataBind();
-                        }
-                    }
-                }
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string query = "SELECT ID, Title, ModuleID, 0 as IsCompleted FROM Lessons WHERE ModuleID = @ModuleID ORDER BY ID";
+                SqlCommand comm = new SqlCommand(query, conn);
+                comm.Parameters.AddWithValue("@ModuleID", moduleId);
+
+                // Step 5: Execute reader using DataAdapter
+                SqlDataAdapter adapter = new SqlDataAdapter(comm);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                rptLessons.DataSource = dt;
+                rptLessons.DataBind();
             }
             catch (Exception)
             {
-                // Log error if needed
                 rptLessons.DataSource = new DataTable();
                 rptLessons.DataBind();
+            }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
     }

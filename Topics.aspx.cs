@@ -64,39 +64,45 @@ namespace Probfessional
                 return;
             }
 
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string moduleQuery = "SELECT ID, Title, Description FROM Modules WHERE ID = @ModuleID";
+                SqlCommand comm = new SqlCommand(moduleQuery, conn);
+                comm.Parameters.AddWithValue("@ModuleID", moduleId);
+
+                // Step 5: Execute reader
+                SqlDataReader reader = comm.ExecuteReader();
+                if (reader.Read())
                 {
-                    conn.Open();
-                    
-                    // Load module details
-                    string moduleQuery = "SELECT ID, Title, Description FROM Modules WHERE ID = @ModuleID";
-                    using (SqlCommand cmd = new SqlCommand(moduleQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ModuleID", moduleId);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                title.InnerText = reader["Title"].ToString();
-                                desc.InnerText = reader["Description"].ToString();
-                            }
-                            else
-                            {
-                                lblError.Visible = true;
-                                lblError.Text = "Module not found.";
-                                return;
-                            }
-                        }
-                    }
+                    title.InnerText = reader["Title"].ToString();
+                    desc.InnerText = reader["Description"].ToString();
+                    reader.Close();
+                }
+                else
+                {
+                    reader.Close();
+                    lblError.Visible = true;
+                    lblError.Text = "Module not found.";
                 }
             }
             catch (Exception ex)
             {
                 lblError.Visible = true;
                 lblError.Text = "An error occurred while loading module details: " + ex.Message;
+            }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
     }

@@ -16,19 +16,6 @@ namespace Probfessional
             {
                 Response.Redirect("Default.aspx");
             }
-
-            if (!IsPostBack)
-            {
-                // Check for remembered credentials
-                if (Request.Cookies["RememberEmail"] != null)
-                {
-                    txtEmail.Text = Server.HtmlDecode(Request.Cookies["RememberEmail"].Value);
-                }
-                if (Request.Cookies["RememberPassword"] != null)
-                {
-                    txtPassword.Attributes["value"] = Server.HtmlDecode(Request.Cookies["RememberPassword"].Value);
-                }
-            }
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
@@ -41,96 +28,88 @@ namespace Probfessional
             string email = txtEmail.Text.Trim();
             string password = txtPassword.Text;
 
+            // Step 1: Import namespaces (already at top)
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string query = "SELECT ID, Email, DisplayName, Password, Role, IsActive FROM Users WHERE Email = @Email";
+                SqlCommand comm = new SqlCommand(query, conn);
+                comm.Parameters.AddWithValue("@Email", email);
+
+                // Step 5: Execute reader
+                SqlDataReader reader = comm.ExecuteReader();
+                if (reader.Read())
                 {
-                    conn.Open();
-                    string query = "SELECT ID, Email, DisplayName, Password, Role, IsActive FROM Users WHERE Email = @Email";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    // Check if account is active
+                    if (!Convert.ToBoolean(reader["IsActive"]))
                     {
-                        cmd.Parameters.AddWithValue("@Email", email);
+                        lblError.Visible = true;
+                        lblError.Text = "Your account is inactive. Please contact administrator.";
+                        reader.Close();
+                        return;
+                    }
 
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                    // Get user data from reader
+                    string userID = reader["ID"].ToString();
+                    string userEmail = reader["Email"].ToString();
+                    string displayName = reader["DisplayName"].ToString();
+                    string role = reader["Role"].ToString();
+                    string savedPassword = reader["Password"].ToString();
+                    reader.Close();
+
+                    if (password == savedPassword)
+                    {
+                        // Login successful - store user info in session
+                        Session["UserID"] = userID;
+                        Session["Email"] = userEmail;
+                        Session["DisplayName"] = displayName;
+                        Session["Role"] = role;
+
+                        // Redirect based on role
+                        string userRole = Session["Role"].ToString();
+                        if (userRole == "Admin")
                         {
-                            if (reader.Read())
-                            {
-                                // Check if account is active
-                                if (!Convert.ToBoolean(reader["IsActive"]))
-                                {
-                                    lblError.Visible = true;
-                                    lblError.Text = "Your account is inactive. Please contact administrator.";
-                                    return;
-                                }
-
-                                // Verify password (plain text comparison)
-                                string savedPassword = reader["Password"].ToString();
-
-                                if (password == savedPassword)
-                                {
-                                    // Login successful - store user info in session
-                                    Session["UserID"] = reader["ID"].ToString();
-                                    Session["Email"] = reader["Email"].ToString();
-                                    Session["DisplayName"] = reader["DisplayName"].ToString();
-                                    Session["Role"] = reader["Role"].ToString();
-
-                                    // Handle Remember Me checkbox
-                                    if (chkRemember.Checked)
-                                    {
-                                        // Save credentials to cookies (30 days expiry)
-                                        Response.Cookies["RememberEmail"].Value = Server.HtmlEncode(email);
-                                        Response.Cookies["RememberEmail"].Expires = DateTime.Now.AddDays(30);
-                                        Response.Cookies["RememberPassword"].Value = Server.HtmlEncode(password);
-                                        Response.Cookies["RememberPassword"].Expires = DateTime.Now.AddDays(30);
-                                    }
-                                    else
-                                    {
-                                        // Clear cookies if Remember Me is not checked
-                                        Response.Cookies["RememberEmail"].Expires = DateTime.Now.AddDays(-1);
-                                        Response.Cookies["RememberPassword"].Expires = DateTime.Now.AddDays(-1);
-                                    }
-
-                                    // Redirect based on role
-                                    string role = reader["Role"].ToString();
-                                    if (role == "Admin")
-                                    {
-                                        Response.Redirect("Admin.aspx");
-                                    }
-                                    else if (role == "Teacher")
-                                    {
-                                        Response.Redirect("Modules.aspx");
-                                    }
-                                    else
-                                    {
-                                        Response.Redirect("Default.aspx");
-                                    }
-                                }
-                                else
-                                {
-                                    // Invalid password
-                                    lblError.Visible = true;
-                                    lblError.Text = "Invalid email or password. Please try again.";
-                                }
-                            }
-                            else
-                            {
-                                // User not found
-                                lblError.Visible = true;
-                                lblError.Text = "Invalid email or password. Please try again.";
-                            }
+                            Response.Redirect("Admin.aspx");
+                        }
+                        else if (userRole == "Teacher")
+                        {
+                            Response.Redirect("Modules.aspx");
+                        }
+                        else
+                        {
+                            Response.Redirect("Default.aspx");
                         }
                     }
+                    else
+                    {
+                        lblError.Visible = true;
+                        lblError.Text = "Invalid email or password. Please try again.";
+                    }
+                }
+                else
+                {
+                    reader.Close();
+                    lblError.Visible = true;
+                    lblError.Text = "Invalid email or password. Please try again.";
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log error (you should implement proper logging)
                 lblError.Visible = true;
                 lblError.Text = "An error occurred. Please try again later.";
-                // In production, log exception details to a file/database
+            }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
     }

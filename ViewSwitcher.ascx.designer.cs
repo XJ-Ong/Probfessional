@@ -7,9 +7,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Probfessional {
-    
-    
-    public partial class ViewSwitcher {
+namespace Probfessional
+{
+
+
+    public partial class ViewSwitcher
+    {
     }
 }
+

@@ -11,17 +11,26 @@ namespace Probfessional
 {
 
 
-    public partial class Register
+    public partial class ManageUsers
     {
 
         /// <summary>
-        /// SqlDataSource1 control.
+        /// lblError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource1;
+        protected global::System.Web.UI.WebControls.Label lblError;
+
+        /// <summary>
+        /// lblStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblStatus;
 
         /// <summary>
         /// lblEmail control.
@@ -60,24 +69,6 @@ namespace Probfessional
         protected global::System.Web.UI.WebControls.TextBox txtDisplayName;
 
         /// <summary>
-        /// lblRole control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblRole;
-
-        /// <summary>
-        /// rdolRole control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList rdolRole;
-
-        /// <summary>
         /// lblPassword control.
         /// </summary>
         /// <remarks>
@@ -96,40 +87,76 @@ namespace Probfessional
         protected global::System.Web.UI.WebControls.TextBox txtPassword;
 
         /// <summary>
-        /// lblConfirm control.
+        /// lblRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblConfirm;
+        protected global::System.Web.UI.WebControls.Label lblRole;
 
         /// <summary>
-        /// txtConfirm control.
+        /// ddlRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtConfirm;
+        protected global::System.Web.UI.WebControls.DropDownList ddlRole;
 
         /// <summary>
-        /// btnRegister control.
+        /// chkIsActive control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnRegister;
+        protected global::System.Web.UI.WebControls.CheckBox chkIsActive;
 
         /// <summary>
-        /// lblError control.
+        /// btnAdd control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblError;
+        protected global::System.Web.UI.WebControls.Button btnAdd;
+
+        /// <summary>
+        /// btnUpdate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpdate;
+
+        /// <summary>
+        /// btnClear control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnClear;
+
+        /// <summary>
+        /// SqlDataSource1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource1;
+
+        /// <summary>
+        /// GridView1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView GridView1;
     }
 }
 

@@ -85,7 +85,7 @@
                             </h4>
                             <div class="input-group ms-3" style="width: 240px;">
                                 <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" placeholder="Search..."></asp:TextBox>
-                                <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn btn-outline-primary" />
+                                <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn btn-outline-primary" CausesValidation="False" />
                             </div>
                         </div>
 
@@ -101,13 +101,13 @@
 
                             <div class="d-flex align-items-center gap-3" runat="server" id="divAuthButtons">
                                 <!-- Anonymous Users -->
-                                <asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="btn btn-outline-secondary" OnClick="btnRegister_Click" />
-                                <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" OnClick="btnLogin_Click" />
+                                <asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="btn btn-outline-secondary" OnClick="btnRegister_Click" CausesValidation="False" />
+                                <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" OnClick="btnLogin_Click" CausesValidation="False" />
                             </div>
                             <!-- Logged In Users -->
                             <div class="d-flex align-items-center gap-3" runat="server" id="divUserProfile" style="display:none;">
                                 <a href="Profile.aspx" style="text-decoration: none; background: linear-gradient(135deg, #1e40af 0%, #0369a1 50%, #0891b2 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-right: 8px;" id="spanUserDisplayName" runat="server"></a>
-                                <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn btn-outline-danger" OnClick="btnLogout_Click" />
+                                <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn btn-outline-danger" OnClick="btnLogout_Click" CausesValidation="False" />
                             </div>
                         </div>
                     </div>

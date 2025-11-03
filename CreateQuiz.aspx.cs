@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
@@ -32,172 +30,295 @@ namespace Probfessional
             if (!IsPostBack)
             {
                 LoadModules();
+                // Initialize question count
+                Session["QuestionCount"] = 1;
+                AddQuestionPanel();
+            }
+            else
+            {
+                // Recreate dynamically added controls on postback
+                RecreateQuestionPanels();
+            }
+        }
+
+        private void RecreateQuestionPanels()
+        {
+            // Recreate question panels based on session state
+            if (Session["QuestionCount"] != null)
+            {
+                int count = Convert.ToInt32(Session["QuestionCount"]);
+                for (int i = 1; i <= count; i++)
+                {
+                    CreateQuestionPanel(i);
+                }
             }
         }
 
         private void LoadModules()
         {
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string query = "SELECT ID, Title FROM Modules ORDER BY Title";
+                SqlCommand comm = new SqlCommand(query, conn);
+
+                // Step 5: Execute reader
+                SqlDataReader reader = comm.ExecuteReader();
+                
+                ddlModule.Items.Clear();
+                ddlModule.Items.Add(new ListItem("-- Select Module --", "0"));
+                
+                while (reader.Read())
                 {
-                    conn.Open();
-                    string query = "SELECT ID, Title FROM Modules ORDER BY Title";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        ddlModule.Items.Clear();
-                        ddlModule.Items.Add(new ListItem("-- Select Module --", "0"));
-                        while (reader.Read())
-                        {
-                            ddlModule.Items.Add(new ListItem(reader["Title"].ToString(), reader["ID"].ToString()));
-                        }
-                    }
+                    ddlModule.Items.Add(new ListItem(reader["Title"].ToString(), reader["ID"].ToString()));
                 }
+                reader.Close();
             }
             catch (Exception ex)
             {
                 lblError.Visible = true;
                 lblError.Text = "Error loading modules: " + ex.Message;
             }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
+            }
+        }
+
+        protected void btnAddQuestion_Click(object sender, EventArgs e)
+        {
+            // Increment question count
+            int currentCount = Session["QuestionCount"] != null ? Convert.ToInt32(Session["QuestionCount"]) : 0;
+            currentCount++;
+            Session["QuestionCount"] = currentCount;
+            
+            // Create the new question panel
+            CreateQuestionPanel(currentCount);
+        }
+
+        private void AddQuestionPanel()
+        {
+            // Get current question count
+            int questionCount = Session["QuestionCount"] != null ? Convert.ToInt32(Session["QuestionCount"]) : 1;
+            CreateQuestionPanel(questionCount);
+        }
+
+        private void CreateQuestionPanel(int questionCount)
+        {
+            // Create question panel
+            Panel questionPanel = new Panel();
+            questionPanel.ID = "pnlQuestion" + questionCount;
+            questionPanel.CssClass = "mb-4 p-3 border rounded";
+
+            // Question number label
+            Label lblQuestionNum = new Label();
+            lblQuestionNum.Text = "Question " + questionCount + ":";
+            lblQuestionNum.CssClass = "fw-bold";
+            questionPanel.Controls.Add(lblQuestionNum);
+            questionPanel.Controls.Add(new LiteralControl("<br />"));
+
+            // Question text
+            Label lblQuestionText = new Label();
+            lblQuestionText.Text = "Question Text:";
+            questionPanel.Controls.Add(lblQuestionText);
+            questionPanel.Controls.Add(new LiteralControl("<br />"));
+            
+            TextBox txtQuestion = new TextBox();
+            txtQuestion.ID = "txtQuestion" + questionCount;
+            txtQuestion.CssClass = "form-control mb-2";
+            txtQuestion.TextMode = TextBoxMode.MultiLine;
+            txtQuestion.Rows = 2;
+            questionPanel.Controls.Add(txtQuestion);
+            questionPanel.Controls.Add(new LiteralControl("<br />"));
+
+            // Options
+            string[] options = { "A", "B", "C", "D" };
+            foreach (string opt in options)
+            {
+                Label lblOption = new Label();
+                lblOption.Text = "Option " + opt + ":";
+                questionPanel.Controls.Add(lblOption);
+                questionPanel.Controls.Add(new LiteralControl(" "));
+                
+                TextBox txtOption = new TextBox();
+                txtOption.ID = "txtOption" + questionCount + opt;
+                txtOption.CssClass = "form-control mb-2 d-inline-block";
+                txtOption.Width = Unit.Percentage(80);
+                questionPanel.Controls.Add(txtOption);
+                questionPanel.Controls.Add(new LiteralControl("<br />"));
+            }
+
+            // Correct answer
+            Label lblCorrect = new Label();
+            lblCorrect.Text = "Correct Answer:";
+            questionPanel.Controls.Add(lblCorrect);
+            questionPanel.Controls.Add(new LiteralControl("<br />"));
+            
+            RadioButtonList rdolCorrect = new RadioButtonList();
+            rdolCorrect.ID = "rdolCorrect" + questionCount;
+            rdolCorrect.RepeatDirection = RepeatDirection.Horizontal;
+            rdolCorrect.Items.Add(new ListItem("A", "A"));
+            rdolCorrect.Items.Add(new ListItem("B", "B"));
+            rdolCorrect.Items.Add(new ListItem("C", "C"));
+            rdolCorrect.Items.Add(new ListItem("D", "D"));
+            questionPanel.Controls.Add(rdolCorrect);
+            questionPanel.Controls.Add(new LiteralControl("<br /><br />"));
+
+            // Only add if not already exists (to prevent duplicates during recreation)
+            if (pnlQuestions.FindControl("pnlQuestion" + questionCount) == null)
+            {
+                pnlQuestions.Controls.Add(questionPanel);
+            }
         }
 
         protected void btnSubmitQuiz_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid)
+            if (ddlModule.SelectedValue == "0")
             {
+                lblError.Visible = true;
+                lblError.Text = "Please select a module.";
                 return;
             }
 
+            // Get questions first to validate
+            List<QuestionData> questions = GetQuestionsFromControls();
+            if (questions.Count == 0)
+            {
+                lblError.Visible = true;
+                lblError.Text = "Please add at least one question.";
+                return;
+            }
+
+            int moduleID = Convert.ToInt32(ddlModule.SelectedValue);
+            int quizID = 0;
+            
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                // Get form data
-                int moduleId = Convert.ToInt32(ddlModule.SelectedValue);
-                
-                // Validate module selection
-                if (moduleId <= 0)
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Find the existing Quiz for this module
+                string getQuizQuery = "SELECT ID FROM Quiz WHERE ModuleID = @ModuleID";
+                SqlCommand commGetQuiz = new SqlCommand(getQuizQuery, conn);
+                commGetQuiz.Parameters.AddWithValue("@ModuleID", moduleID);
+
+                // Step 5: Execute and get the existing quiz ID
+                object result = commGetQuiz.ExecuteScalar();
+                if (result != null)
                 {
-                    lblError.Visible = true;
-                    lblError.Text = "Please select a valid module.";
-                    return;
+                    quizID = Convert.ToInt32(result);
                 }
-                
-                // Auto-generate quiz title from module name
-                string moduleTitle = ddlModule.SelectedItem.Text;
-                string quizTitle = moduleTitle + " Quiz";
-
-                // Get all questions from the form
-                List<QuizQuestionData> questions = GetQuestionsFromForm();
-
-                if (questions.Count == 0)
+                else
                 {
                     lblError.Visible = true;
-                    lblError.Text = "Please add at least one question to the quiz.";
+                    lblError.Text = "Error: Quiz not found for selected module. Please contact administrator.";
                     return;
                 }
 
-                // Save to database
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Insert each question into the existing quiz
+                foreach (var question in questions)
                 {
-                    conn.Open();
-
-                    // Insert quiz
-                    int quizId;
-                    string insertQuizQuery = "INSERT INTO [Quiz] ([ModuleID], [Title]) VALUES (@ModuleID, @Title); SELECT CAST(SCOPE_IDENTITY() as int);";
-                    using (SqlCommand cmd = new SqlCommand(insertQuizQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ModuleID", moduleId);
-                        cmd.Parameters.AddWithValue("@Title", quizTitle);
-                        quizId = (int)cmd.ExecuteScalar();
-                    }
-
-                    // Insert questions
-                    string insertQuestionQuery = @"INSERT INTO [QuizQuestion] ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice]) 
-                                                   VALUES (@QuizID, @QuestionText, @ChoiceA, @ChoiceB, @ChoiceC, @ChoiceD, @CorrectChoice)";
-
-                    foreach (var question in questions)
-                    {
-                        using (SqlCommand cmd = new SqlCommand(insertQuestionQuery, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@QuizID", quizId);
-                            cmd.Parameters.AddWithValue("@QuestionText", question.QuestionText);
-                            cmd.Parameters.AddWithValue("@ChoiceA", question.ChoiceA);
-                            cmd.Parameters.AddWithValue("@ChoiceB", question.ChoiceB);
-                            cmd.Parameters.AddWithValue("@ChoiceC", question.ChoiceC);
-                            cmd.Parameters.AddWithValue("@ChoiceD", question.ChoiceD);
-                            cmd.Parameters.AddWithValue("@CorrectChoice", question.CorrectChoice);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
+                    string insertQuestionQuery = "INSERT INTO [QuizQuestion] ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice]) VALUES (@QuizID, @QuestionText, @ChoiceA, @ChoiceB, @ChoiceC, @ChoiceD, @CorrectChoice)";
+                    SqlCommand commQuestion = new SqlCommand(insertQuestionQuery, conn);
+                    commQuestion.Parameters.AddWithValue("@QuizID", quizID);
+                    commQuestion.Parameters.AddWithValue("@QuestionText", question.QuestionText);
+                    commQuestion.Parameters.AddWithValue("@ChoiceA", question.ChoiceA);
+                    commQuestion.Parameters.AddWithValue("@ChoiceB", question.ChoiceB);
+                    commQuestion.Parameters.AddWithValue("@ChoiceC", question.ChoiceC);
+                    commQuestion.Parameters.AddWithValue("@ChoiceD", question.ChoiceD);
+                    commQuestion.Parameters.AddWithValue("@CorrectChoice", question.CorrectChoice);
+                    
+                    commQuestion.ExecuteNonQuery();
                 }
 
-                // Show success message
+                // Success
                 pnlQuizForm.Visible = false;
                 pnlSuccess.Visible = true;
+                Session["QuestionCount"] = null; // Clear question count
+                
+                lblStatus.Visible = true;
+                lblStatus.Text = $"Success! {questions.Count} question(s) added to {ddlModule.SelectedItem.Text} quiz (Quiz ID: {quizID}).";
             }
             catch (Exception ex)
             {
                 lblError.Visible = true;
-                lblError.Text = "Error creating quiz: " + ex.Message;
-                System.Diagnostics.Debug.WriteLine("Quiz creation error: " + ex.ToString());
+                lblError.Text = "Error adding questions: " + ex.Message;
+            }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
 
-        private List<QuizQuestionData> GetQuestionsFromForm()
+        protected void SqlDataSourceQuiz_Inserted(object sender, SqlDataSourceStatusEventArgs e)
         {
-            List<QuizQuestionData> questions = new List<QuizQuestionData>();
+            // This event handler is no longer used but kept for compatibility
+        }
 
-            // Get all question cards
-            var questionCards = Request.Form.AllKeys
-                .Where(key => key.StartsWith("question-text-"))
-                .ToList();
+        private List<QuestionData> GetQuestionsFromControls()
+        {
+            List<QuestionData> questions = new List<QuestionData>();
 
-            foreach (var questionKey in questionCards)
+            foreach (Control ctrl in pnlQuestions.Controls)
             {
-                // Extract question number
-                string questionNum = questionKey.Replace("question-text-", "");
-
-                // Get question text
-                string questionText = Request.Form[questionKey];
-
-                // Skip if question text is empty
-                if (string.IsNullOrWhiteSpace(questionText))
-                    continue;
-
-                // Get correct answer
-                string correctAnswer = Request.Form[$"correct-{questionNum}"];
-
-                // Get options
-                string choiceA = Request.Form[$"option-{questionNum}-A"] ?? "";
-                string choiceB = Request.Form[$"option-{questionNum}-B"] ?? "";
-                string choiceC = Request.Form[$"option-{questionNum}-C"] ?? "";
-                string choiceD = Request.Form[$"option-{questionNum}-D"] ?? "";
-
-                // Skip if any required field is missing
-                if (string.IsNullOrWhiteSpace(correctAnswer) ||
-                    string.IsNullOrWhiteSpace(choiceA) ||
-                    string.IsNullOrWhiteSpace(choiceB) ||
-                    string.IsNullOrWhiteSpace(choiceC) ||
-                    string.IsNullOrWhiteSpace(choiceD))
-                    continue;
-
-                questions.Add(new QuizQuestionData
+                if (ctrl is Panel && ctrl.ID.StartsWith("pnlQuestion"))
                 {
-                    QuestionText = questionText,
-                    ChoiceA = choiceA,
-                    ChoiceB = choiceB,
-                    ChoiceC = choiceC,
-                    ChoiceD = choiceD,
-                    CorrectChoice = correctAnswer
-                });
+                    string questionNum = ctrl.ID.Replace("pnlQuestion", "");
+                    
+                    // Find controls in this panel
+                    TextBox txtQuestion = ctrl.FindControl("txtQuestion" + questionNum) as TextBox;
+                    if (txtQuestion == null || string.IsNullOrWhiteSpace(txtQuestion.Text))
+                        continue;
+
+                    RadioButtonList rdolCorrect = ctrl.FindControl("rdolCorrect" + questionNum) as RadioButtonList;
+                    if (rdolCorrect == null || string.IsNullOrEmpty(rdolCorrect.SelectedValue))
+                        continue;
+
+                    TextBox txtA = ctrl.FindControl("txtOption" + questionNum + "A") as TextBox;
+                    TextBox txtB = ctrl.FindControl("txtOption" + questionNum + "B") as TextBox;
+                    TextBox txtC = ctrl.FindControl("txtOption" + questionNum + "C") as TextBox;
+                    TextBox txtD = ctrl.FindControl("txtOption" + questionNum + "D") as TextBox;
+
+                    if (txtA == null || txtB == null || txtC == null || txtD == null)
+                        continue;
+
+                    if (string.IsNullOrWhiteSpace(txtA.Text) || 
+                        string.IsNullOrWhiteSpace(txtB.Text) || 
+                        string.IsNullOrWhiteSpace(txtC.Text) || 
+                        string.IsNullOrWhiteSpace(txtD.Text))
+                        continue;
+
+                    questions.Add(new QuestionData
+                    {
+                        QuestionText = txtQuestion.Text,
+                        ChoiceA = txtA.Text,
+                        ChoiceB = txtB.Text,
+                        ChoiceC = txtC.Text,
+                        ChoiceD = txtD.Text,
+                        CorrectChoice = rdolCorrect.SelectedValue
+                    });
+                }
             }
 
             return questions;
         }
 
-        private class QuizQuestionData
+        private class QuestionData
         {
             public string QuestionText { get; set; }
             public string ChoiceA { get; set; }

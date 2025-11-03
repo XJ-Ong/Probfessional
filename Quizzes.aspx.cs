@@ -103,41 +103,43 @@ namespace Probfessional
         private void LoadQuizForModule(int moduleId)
         {
             this.moduleId = moduleId;
+            
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string quizQuery = "SELECT ID, Title FROM Quiz WHERE ModuleID = @ModuleID";
+                SqlCommand comm = new SqlCommand(quizQuery, conn);
+                comm.Parameters.AddWithValue("@ModuleID", moduleId);
+
+                // Step 5: Execute reader
+                SqlDataReader reader = comm.ExecuteReader();
+                int quizCount = 0;
+                while (reader.Read())
                 {
-                    conn.Open();
-                    
-                    // Get quiz for this module
-                    string quizQuery = "SELECT ID, Title FROM Quiz WHERE ModuleID = @ModuleID";
-                    using (SqlCommand cmd = new SqlCommand(quizQuery, conn))
+                    if (quizCount == 0)
                     {
-                        cmd.Parameters.AddWithValue("@ModuleID", moduleId);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            int quizCount = 0;
-                            while (reader.Read())
-                            {
-                                if (quizCount == 0)
-                                {
-                                    // Load first quiz by default
-                                    quizId = Convert.ToInt32(reader["ID"]);
-                                    quizTitle.InnerText = reader["Title"].ToString();
-                                    LoadQuizQuestions();
-                                }
-                                quizCount++;
-                            }
-                            
-                            if (quizCount == 0)
-                            {
-                                lblValidationError.Visible = true;
-                                lblValidationError.Text = "No quiz found for this module.";
-                                ClearQuiz();
-                            }
-                        }
+                        quizId = Convert.ToInt32(reader["ID"]);
+                        quizTitle.InnerText = reader["Title"].ToString();
+                        reader.Close();
+                        LoadQuizQuestions();
+                        return;
                     }
+                    quizCount++;
+                }
+                reader.Close();
+                
+                if (quizCount == 0)
+                {
+                    lblValidationError.Visible = true;
+                    lblValidationError.Text = "No quiz found for this module.";
+                    ClearQuiz();
                 }
             }
             catch (Exception ex)
@@ -146,46 +148,55 @@ namespace Probfessional
                 lblValidationError.Text = "Error loading quiz: " + ex.Message;
                 ClearQuiz();
             }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
+            }
         }
 
         private void LoadQuizQuestions()
         {
             quizQuestions.Clear();
+            
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string query = "SELECT ID, QuestionText, ChoiceA, ChoiceB, ChoiceC, ChoiceD, CorrectChoice FROM QuizQuestion WHERE QuizID = @QuizID ORDER BY ID";
+                SqlCommand comm = new SqlCommand(query, conn);
+                comm.Parameters.AddWithValue("@QuizID", quizId);
+
+                // Step 5: Execute reader
+                SqlDataReader reader = comm.ExecuteReader();
+                while (reader.Read())
                 {
-                    conn.Open();
-                    string query = "SELECT ID, QuestionText, ChoiceA, ChoiceB, ChoiceC, ChoiceD, CorrectChoice FROM QuizQuestion WHERE QuizID = @QuizID ORDER BY ID";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    quizQuestions.Add(new QuizQuestion
                     {
-                        cmd.Parameters.AddWithValue("@QuizID", quizId);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                quizQuestions.Add(new QuizQuestion
-                                {
-                                    ID = Convert.ToInt32(reader["ID"]),
-                                    QuestionText = reader["QuestionText"].ToString(),
-                                    ChoiceA = reader["ChoiceA"]?.ToString() ?? "",
-                                    ChoiceB = reader["ChoiceB"]?.ToString() ?? "",
-                                    ChoiceC = reader["ChoiceC"]?.ToString() ?? "",
-                                    ChoiceD = reader["ChoiceD"]?.ToString() ?? "",
-                                    CorrectChoice = reader["CorrectChoice"]?.ToString() ?? ""
-                                });
-                            }
-                        }
-                    }
+                        ID = Convert.ToInt32(reader["ID"]),
+                        QuestionText = reader["QuestionText"].ToString(),
+                        ChoiceA = reader["ChoiceA"]?.ToString() ?? "",
+                        ChoiceB = reader["ChoiceB"]?.ToString() ?? "",
+                        ChoiceC = reader["ChoiceC"]?.ToString() ?? "",
+                        ChoiceD = reader["ChoiceD"]?.ToString() ?? "",
+                        CorrectChoice = reader["CorrectChoice"]?.ToString() ?? ""
+                    });
                 }
+                reader.Close();
 
                 Session["QuizQuestions"] = quizQuestions;
                 Session["QuizID"] = quizId;
                 Session["ModuleID"] = moduleId;
                 currentQuestionIndex = 0;
                 Session["CurrentQuestionIndex"] = currentQuestionIndex;
-                Session["QuizAnswers"] = new Dictionary<int, string>(); // Initialize answers dictionary
+                Session["QuizAnswers"] = new Dictionary<int, string>();
                 
                 DisplayCurrentQuestion();
             }
@@ -193,6 +204,12 @@ namespace Probfessional
             {
                 lblValidationError.Visible = true;
                 lblValidationError.Text = "Error loading questions: " + ex.Message;
+            }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
 
@@ -234,41 +251,56 @@ namespace Probfessional
                 // Update page indicator
                 litPageInfo.Text = $"Question {currentQuestionIndex + 1} of {quizQuestions.Count}";
                 
-                // Create question card
-                System.Text.StringBuilder html = new System.Text.StringBuilder();
-                html.Append("<div class='question-card'>");
-                html.Append($"<div class='question-text'>{System.Security.SecurityElement.Escape(question.QuestionText)}</div>");
-                html.Append("<table>");
+                // Clear previous controls
+                phQuestions.Controls.Clear();
                 
-                // Use unique IDs based on question ID
-                string qId = "q" + question.ID + "_";
+                // Create question container
+                Panel questionPanel = new Panel();
+                questionPanel.CssClass = "mb-4 p-3 border";
+                
+                // Question text label
+                Label lblQuestion = new Label();
+                lblQuestion.Text = System.Security.SecurityElement.Escape(question.QuestionText);
+                lblQuestion.CssClass = "fw-bold mb-3 d-block";
+                questionPanel.Controls.Add(lblQuestion);
+                
+                // Create RadioButtonList for choices
+                RadioButtonList rdolChoices = new RadioButtonList();
+                rdolChoices.ID = "rdolQuestion" + question.ID;
+                rdolChoices.CssClass = "form-check mb-3";
+                rdolChoices.RepeatLayout = RepeatLayout.UnorderedList;
+                rdolChoices.CellSpacing = 10; // Add spacing between choices
                 
                 if (!string.IsNullOrEmpty(question.ChoiceA))
                 {
-                    string checkedA = (savedAnswer == "A") ? "checked" : "";
-                    html.Append($"<tr><td><input type='radio' id='{qId}choiceA' name='questionChoice' value='A' {checkedA} /><label for='{qId}choiceA'>" + System.Security.SecurityElement.Escape(question.ChoiceA) + "</label></td></tr>");
+                    ListItem itemA = new ListItem("&nbsp;&nbsp;A. " + System.Security.SecurityElement.Escape(question.ChoiceA), "A");
+                    if (savedAnswer == "A") itemA.Selected = true;
+                    rdolChoices.Items.Add(itemA);
                 }
                 if (!string.IsNullOrEmpty(question.ChoiceB))
                 {
-                    string checkedB = (savedAnswer == "B") ? "checked" : "";
-                    html.Append($"<tr><td><input type='radio' id='{qId}choiceB' name='questionChoice' value='B' {checkedB} /><label for='{qId}choiceB'>" + System.Security.SecurityElement.Escape(question.ChoiceB) + "</label></td></tr>");
+                    ListItem itemB = new ListItem("&nbsp;&nbsp;B. " + System.Security.SecurityElement.Escape(question.ChoiceB), "B");
+                    if (savedAnswer == "B") itemB.Selected = true;
+                    rdolChoices.Items.Add(itemB);
                 }
                 if (!string.IsNullOrEmpty(question.ChoiceC))
                 {
-                    string checkedC = (savedAnswer == "C") ? "checked" : "";
-                    html.Append($"<tr><td><input type='radio' id='{qId}choiceC' name='questionChoice' value='C' {checkedC} /><label for='{qId}choiceC'>" + System.Security.SecurityElement.Escape(question.ChoiceC) + "</label></td></tr>");
+                    ListItem itemC = new ListItem("&nbsp;&nbsp;C. " + System.Security.SecurityElement.Escape(question.ChoiceC), "C");
+                    if (savedAnswer == "C") itemC.Selected = true;
+                    rdolChoices.Items.Add(itemC);
                 }
                 if (!string.IsNullOrEmpty(question.ChoiceD))
                 {
-                    string checkedD = (savedAnswer == "D") ? "checked" : "";
-                    html.Append($"<tr><td><input type='radio' id='{qId}choiceD' name='questionChoice' value='D' {checkedD} /><label for='{qId}choiceD'>" + System.Security.SecurityElement.Escape(question.ChoiceD) + "</label></td></tr>");
+                    ListItem itemD = new ListItem("&nbsp;&nbsp;D. " + System.Security.SecurityElement.Escape(question.ChoiceD), "D");
+                    if (savedAnswer == "D") itemD.Selected = true;
+                    rdolChoices.Items.Add(itemD);
                 }
                 
-                html.Append("</table>");
-                html.Append("</div>");
+                questionPanel.Controls.Add(rdolChoices);
+                phQuestions.Controls.Add(questionPanel);
                 
-                phQuestions.Controls.Clear();
-                phQuestions.Controls.Add(new LiteralControl(html.ToString()));
+                // Store question ID for later retrieval
+                ViewState["CurrentQuestionID"] = question.ID;
                 
                 // Show previous button if not first question
                 btnPrevious.Visible = currentQuestionIndex > 0;
@@ -311,17 +343,23 @@ namespace Probfessional
 
         private void SaveCurrentAnswer()
         {
-            string selectedAnswer = Request.Form["questionChoice"];
-            if (!string.IsNullOrEmpty(selectedAnswer) && quizQuestions.Count > 0 && currentQuestionIndex < quizQuestions.Count)
+            if (quizQuestions.Count > 0 && currentQuestionIndex < quizQuestions.Count)
             {
                 int questionId = quizQuestions[currentQuestionIndex].ID;
-                Dictionary<int, string> answers = Session["QuizAnswers"] as Dictionary<int, string>;
-                if (answers == null)
+                
+                // Find the RadioButtonList control
+                RadioButtonList rdolChoices = phQuestions.FindControl("rdolQuestion" + questionId) as RadioButtonList;
+                if (rdolChoices != null && !string.IsNullOrEmpty(rdolChoices.SelectedValue))
                 {
-                    answers = new Dictionary<int, string>();
+                    string selectedAnswer = rdolChoices.SelectedValue;
+                    Dictionary<int, string> answers = Session["QuizAnswers"] as Dictionary<int, string>;
+                    if (answers == null)
+                    {
+                        answers = new Dictionary<int, string>();
+                    }
+                    answers[questionId] = selectedAnswer;
+                    Session["QuizAnswers"] = answers;
                 }
-                answers[questionId] = selectedAnswer;
-                Session["QuizAnswers"] = answers;
             }
         }
 
@@ -432,30 +470,36 @@ namespace Probfessional
 
         private void SaveQuizAttempt(int correctCount, int totalQuestions, double scorePercentage)
         {
+            // Step 2: Create connection
+            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            SqlConnection conn = new SqlConnection(connStr);
+
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    
-                    string query = @"INSERT INTO [QuizAttempts] ([UserID], [QuizID], [Score], [TakenTime]) 
-                                     VALUES (@UserID, @QuizID, @Score, GETDATE())";
-                    
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
-                        cmd.Parameters.AddWithValue("@QuizID", quizId);
-                        cmd.Parameters.AddWithValue("@Score", (decimal)scorePercentage);
-                        
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                // Step 3: Open connection
+                conn.Open();
+
+                // Step 4: Prepare SqlCommand
+                string query = @"INSERT INTO [QuizAttempts] ([UserID], [QuizID], [Score], [TakenTime]) 
+                                 VALUES (@UserID, @QuizID, @Score, GETDATE())";
+                SqlCommand comm = new SqlCommand(query, conn);
+                comm.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                comm.Parameters.AddWithValue("@QuizID", quizId);
+                comm.Parameters.AddWithValue("@Score", (decimal)scorePercentage);
+
+                // Step 5: Execute non-query
+                comm.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
                 // Log error but don't prevent user from seeing results
                 System.Diagnostics.Debug.WriteLine("Error saving quiz attempt: " + ex.Message);
+            }
+            finally
+            {
+                // Step 6: Close connection
+                if (conn.State == System.Data.ConnectionState.Open)
+                    conn.Close();
             }
         }
 
