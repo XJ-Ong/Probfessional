@@ -30,6 +30,23 @@ namespace Probfessional
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Check if user is logged in
+            if (Session["UserID"] == null)
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
+
+            // Show Create Quiz button only for teachers
+            if (Session["Role"] != null && Session["Role"].ToString() == "Teacher")
+            {
+                divCreateQuiz.Visible = true;
+            }
+            else
+            {
+                divCreateQuiz.Visible = false;
+            }
+
             if (!IsPostBack)
             {
                 // This will be handled in PreRender to ensure dropdown is populated first
@@ -100,13 +117,20 @@ namespace Probfessional
                         cmd.Parameters.AddWithValue("@ModuleID", moduleId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
+                            int quizCount = 0;
+                            while (reader.Read())
                             {
-                                quizId = Convert.ToInt32(reader["ID"]);
-                                quizTitle.InnerText = reader["Title"].ToString();
-                                LoadQuizQuestions();
+                                if (quizCount == 0)
+                                {
+                                    // Load first quiz by default
+                                    quizId = Convert.ToInt32(reader["ID"]);
+                                    quizTitle.InnerText = reader["Title"].ToString();
+                                    LoadQuizQuestions();
+                                }
+                                quizCount++;
                             }
-                            else
+                            
+                            if (quizCount == 0)
                             {
                                 lblValidationError.Visible = true;
                                 lblValidationError.Text = "No quiz found for this module.";
@@ -161,6 +185,7 @@ namespace Probfessional
                 Session["ModuleID"] = moduleId;
                 currentQuestionIndex = 0;
                 Session["CurrentQuestionIndex"] = currentQuestionIndex;
+                Session["QuizAnswers"] = new Dictionary<int, string>(); // Initialize answers dictionary
                 
                 DisplayCurrentQuestion();
             }
@@ -195,6 +220,17 @@ namespace Probfessional
             {
                 QuizQuestion question = quizQuestions[currentQuestionIndex];
                 
+                // Get saved answer if exists
+                string savedAnswer = "";
+                if (Session["QuizAnswers"] != null)
+                {
+                    var answers = (Dictionary<int, string>)Session["QuizAnswers"];
+                    if (answers.ContainsKey(question.ID))
+                    {
+                        savedAnswer = answers[question.ID];
+                    }
+                }
+                
                 // Update page indicator
                 litPageInfo.Text = $"Question {currentQuestionIndex + 1} of {quizQuestions.Count}";
                 
@@ -204,21 +240,28 @@ namespace Probfessional
                 html.Append($"<div class='question-text'>{System.Security.SecurityElement.Escape(question.QuestionText)}</div>");
                 html.Append("<table>");
                 
+                // Use unique IDs based on question ID
+                string qId = "q" + question.ID + "_";
+                
                 if (!string.IsNullOrEmpty(question.ChoiceA))
                 {
-                    html.Append("<tr><td><input type='radio' id='choiceA' name='questionChoice' value='A' /><label for='choiceA'>" + System.Security.SecurityElement.Escape(question.ChoiceA) + "</label></td></tr>");
+                    string checkedA = (savedAnswer == "A") ? "checked" : "";
+                    html.Append($"<tr><td><input type='radio' id='{qId}choiceA' name='questionChoice' value='A' {checkedA} /><label for='{qId}choiceA'>" + System.Security.SecurityElement.Escape(question.ChoiceA) + "</label></td></tr>");
                 }
                 if (!string.IsNullOrEmpty(question.ChoiceB))
                 {
-                    html.Append("<tr><td><input type='radio' id='choiceB' name='questionChoice' value='B' /><label for='choiceB'>" + System.Security.SecurityElement.Escape(question.ChoiceB) + "</label></td></tr>");
+                    string checkedB = (savedAnswer == "B") ? "checked" : "";
+                    html.Append($"<tr><td><input type='radio' id='{qId}choiceB' name='questionChoice' value='B' {checkedB} /><label for='{qId}choiceB'>" + System.Security.SecurityElement.Escape(question.ChoiceB) + "</label></td></tr>");
                 }
                 if (!string.IsNullOrEmpty(question.ChoiceC))
                 {
-                    html.Append("<tr><td><input type='radio' id='choiceC' name='questionChoice' value='C' /><label for='choiceC'>" + System.Security.SecurityElement.Escape(question.ChoiceC) + "</label></td></tr>");
+                    string checkedC = (savedAnswer == "C") ? "checked" : "";
+                    html.Append($"<tr><td><input type='radio' id='{qId}choiceC' name='questionChoice' value='C' {checkedC} /><label for='{qId}choiceC'>" + System.Security.SecurityElement.Escape(question.ChoiceC) + "</label></td></tr>");
                 }
                 if (!string.IsNullOrEmpty(question.ChoiceD))
                 {
-                    html.Append("<tr><td><input type='radio' id='choiceD' name='questionChoice' value='D' /><label for='choiceD'>" + System.Security.SecurityElement.Escape(question.ChoiceD) + "</label></td></tr>");
+                    string checkedD = (savedAnswer == "D") ? "checked" : "";
+                    html.Append($"<tr><td><input type='radio' id='{qId}choiceD' name='questionChoice' value='D' {checkedD} /><label for='{qId}choiceD'>" + System.Security.SecurityElement.Escape(question.ChoiceD) + "</label></td></tr>");
                 }
                 
                 html.Append("</table>");
@@ -246,6 +289,7 @@ namespace Probfessional
 
         protected void btnPrevious_Click(object sender, EventArgs e)
         {
+            SaveCurrentAnswer();
             currentQuestionIndex--;
             Session["CurrentQuestionIndex"] = currentQuestionIndex;
             DisplayCurrentQuestion();
@@ -253,6 +297,7 @@ namespace Probfessional
 
         protected void btnNext_Click(object sender, EventArgs e)
         {
+            SaveCurrentAnswer();
             currentQuestionIndex++;
             Session["CurrentQuestionIndex"] = currentQuestionIndex;
             DisplayCurrentQuestion();
@@ -260,9 +305,158 @@ namespace Probfessional
 
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
-            // Save current answer before submitting
-            // For now, just show a simple message
-            ClientScript.RegisterStartupScript(this.GetType(), "QuizComplete", "alert('Quiz submitted! Results coming soon.');", true);
+            SaveCurrentAnswer();
+            ShowQuizResults();
+        }
+
+        private void SaveCurrentAnswer()
+        {
+            string selectedAnswer = Request.Form["questionChoice"];
+            if (!string.IsNullOrEmpty(selectedAnswer) && quizQuestions.Count > 0 && currentQuestionIndex < quizQuestions.Count)
+            {
+                int questionId = quizQuestions[currentQuestionIndex].ID;
+                Dictionary<int, string> answers = Session["QuizAnswers"] as Dictionary<int, string>;
+                if (answers == null)
+                {
+                    answers = new Dictionary<int, string>();
+                }
+                answers[questionId] = selectedAnswer;
+                Session["QuizAnswers"] = answers;
+            }
+        }
+
+        private void ShowQuizResults()
+        {
+            if (quizQuestions.Count == 0)
+            {
+                return;
+            }
+
+            Dictionary<int, string> userAnswers = Session["QuizAnswers"] as Dictionary<int, string> ?? new Dictionary<int, string>();
+            int correctCount = 0;
+            int totalQuestions = quizQuestions.Count;
+
+            // Build results HTML
+            System.Text.StringBuilder resultsHtml = new System.Text.StringBuilder();
+            resultsHtml.Append("<div style='background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 30px;'>");
+            resultsHtml.Append("<h2 style='color: #2d3748; margin-bottom: 25px; text-align: center;'>Quiz Results</h2>");
+
+            // Display each question with result
+            for (int i = 0; i < quizQuestions.Count; i++)
+            {
+                QuizQuestion question = quizQuestions[i];
+                string userAnswer = userAnswers.ContainsKey(question.ID) ? userAnswers[question.ID] : "";
+                bool isCorrect = userAnswer == question.CorrectChoice;
+
+                if (isCorrect)
+                {
+                    correctCount++;
+                }
+
+                resultsHtml.Append("<div style='margin-bottom: 30px; padding: 20px; border: 2px solid " + (isCorrect ? "#48bb78" : "#f56565") + "; border-radius: 8px; background: " + (isCorrect ? "#f0fff4" : "#fff5f5") + ";'>");
+                resultsHtml.Append("<div style='display: flex; align-items: center; margin-bottom: 15px;'>");
+                resultsHtml.Append("<span style='background: " + (isCorrect ? "#48bb78" : "#f56565") + "; color: white; font-weight: bold; padding: 5px 12px; border-radius: 20px; margin-right: 15px;'>");
+                resultsHtml.Append(isCorrect ? "✓ Correct" : "✗ Incorrect");
+                resultsHtml.Append("</span>");
+                resultsHtml.Append("<strong style='color: #2d3748;'>Question " + (i + 1) + "</strong>");
+                resultsHtml.Append("</div>");
+
+                resultsHtml.Append("<div style='font-size: 1.1rem; color: #2d3748; margin-bottom: 15px;'>" + System.Security.SecurityElement.Escape(question.QuestionText) + "</div>");
+
+                // Show all options with styling
+                string[] choices = { question.ChoiceA, question.ChoiceB, question.ChoiceC, question.ChoiceD };
+                string[] choiceLetters = { "A", "B", "C", "D" };
+
+                foreach (int j in Enumerable.Range(0, 4))
+                {
+                    if (!string.IsNullOrEmpty(choices[j]))
+                    {
+                        bool isSelected = userAnswer == choiceLetters[j];
+                        bool isCorrectAnswer = question.CorrectChoice == choiceLetters[j];
+
+                        string optionStyle = "";
+                        string icon = "";
+
+                        if (isCorrectAnswer)
+                        {
+                            optionStyle = "background: #d4edda; border-color: #48bb78; font-weight: bold;";
+                            icon = "✓ ";
+                        }
+                        else if (isSelected && !isCorrectAnswer)
+                        {
+                            optionStyle = "background: #f8d7da; border-color: #f56565;";
+                            icon = "✗ ";
+                        }
+
+                        resultsHtml.Append("<div style='padding: 12px; margin-bottom: 8px; border: 2px solid #e2e8f0; border-radius: 8px; " + optionStyle + "'>");
+                        resultsHtml.Append(icon + "<strong>" + choiceLetters[j] + ":</strong> " + System.Security.SecurityElement.Escape(choices[j]));
+                        resultsHtml.Append("</div>");
+                    }
+                }
+
+                resultsHtml.Append("</div>");
+            }
+
+            // Display score summary
+            double scorePercentage = (correctCount * 100.0) / totalQuestions;
+            string gradeColor = scorePercentage >= 70 ? "#48bb78" : scorePercentage >= 50 ? "#f39c12" : "#f56565";
+            string gradeText = scorePercentage >= 70 ? "Excellent!" : scorePercentage >= 50 ? "Good Effort!" : "Keep Practicing!";
+
+            // Save quiz attempt to database if user is logged in
+            if (Session["UserID"] != null)
+            {
+                SaveQuizAttempt(correctCount, totalQuestions, scorePercentage);
+            }
+
+            resultsHtml.Append("<div style='text-align: center; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; margin-top: 20px;'>");
+            resultsHtml.Append("<div style='font-size: 3rem; font-weight: bold; margin-bottom: 10px;'>" + correctCount + " / " + totalQuestions + "</div>");
+            resultsHtml.Append("<div style='font-size: 1.5rem; margin-bottom: 5px;'>Score: " + scorePercentage.ToString("F1") + "%</div>");
+            resultsHtml.Append("<div style='font-size: 1.2rem;'>" + gradeText + "</div>");
+            resultsHtml.Append("</div>");
+
+            resultsHtml.Append("</div>");
+
+            phQuestions.Controls.Clear();
+            phQuestions.Controls.Add(new LiteralControl(resultsHtml.ToString()));
+
+            // Hide navigation buttons
+            btnPrevious.Visible = false;
+            btnNext.Visible = false;
+            btnSubmit.Visible = false;
+            litPageInfo.Text = "Quiz Completed";
+
+            // Hide module selector and title to focus on results
+            ddlModules.Visible = false;
+            quizTitle.Visible = false;
+        }
+
+        private void SaveQuizAttempt(int correctCount, int totalQuestions, double scorePercentage)
+        {
+            try
+            {
+                string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    
+                    string query = @"INSERT INTO [QuizAttempts] ([UserID], [QuizID], [Score], [TakenTime]) 
+                                     VALUES (@UserID, @QuizID, @Score, GETDATE())";
+                    
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                        cmd.Parameters.AddWithValue("@QuizID", quizId);
+                        cmd.Parameters.AddWithValue("@Score", (decimal)scorePercentage);
+                        
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't prevent user from seeing results
+                System.Diagnostics.Debug.WriteLine("Error saving quiz attempt: " + ex.Message);
+            }
         }
 
         private void ClearQuiz()
@@ -275,6 +469,7 @@ namespace Probfessional
             btnSubmit.Visible = false;
             quizQuestions.Clear();
             Session["QuizQuestions"] = null;
+            Session["QuizAnswers"] = null;
         }
     }
 }

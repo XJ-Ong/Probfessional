@@ -54,6 +54,17 @@
         .topic-title {
             margin-bottom: 12px;
         }
+        
+        /* Responsive button layout */
+        @media (max-width: 576px) {
+            .text-center.mt-4 {
+                flex-direction: column !important;
+            }
+            .text-center.mt-4 a.btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
     </style>
 
     <div>

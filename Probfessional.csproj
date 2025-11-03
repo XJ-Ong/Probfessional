@@ -163,6 +163,8 @@
     <Content Include="ForgotPassword.aspx" />
     <Content Include="Topics.aspx" />
     <Content Include="Lessons.aspx" />
+    <Content Include="CreateQuiz.aspx" />
+    <Content Include="Rank.aspx" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -318,6 +320,20 @@
     </Compile>
     <Compile Include="Lessons.aspx.designer.cs">
       <DependentUpon>Lessons.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CreateQuiz.aspx.cs">
+      <DependentUpon>CreateQuiz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreateQuiz.aspx.designer.cs">
+      <DependentUpon>CreateQuiz.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Rank.aspx.cs">
+      <DependentUpon>Rank.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Rank.aspx.designer.cs">
+      <DependentUpon>Rank.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

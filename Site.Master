@@ -35,6 +35,13 @@
         .nav-link:active {
             color: #1e40af !important;
         }
+        #spanUserDisplayName {
+            transition: all 0.3s ease;
+        }
+        #spanUserDisplayName:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(30,64,175,0.4);
+        }
     </style>
 
 </head>
@@ -99,7 +106,7 @@
                             </div>
                             <!-- Logged In Users -->
                             <div class="d-flex align-items-center gap-3" runat="server" id="divUserProfile" style="display:none;">
-                                <span id="spanUserDisplayName" runat="server" style="background: linear-gradient(135deg, #1e40af 0%, #0369a1 50%, #0891b2 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-right: 8px;"></span>
+                                <a href="Profile.aspx" style="text-decoration: none; background: linear-gradient(135deg, #1e40af 0%, #0369a1 50%, #0891b2 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-right: 8px;" id="spanUserDisplayName" runat="server"></a>
                                 <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn btn-outline-danger" OnClick="btnLogout_Click" />
                             </div>
                         </div>

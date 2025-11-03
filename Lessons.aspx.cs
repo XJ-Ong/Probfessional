@@ -13,6 +13,13 @@ namespace Probfessional
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Check if user is logged in
+            if (Session["UserID"] == null)
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
+
             if (!IsPostBack)
             {
                 LoadLesson();

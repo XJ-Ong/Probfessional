@@ -13,6 +13,16 @@
             <label for="<%= ddlModules.ClientID %>" class="module-selector-label-outside">Select Module:</label>
             <asp:DropDownList ID="ddlModules" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlModules_SelectedIndexChanged" CssClass="quiz-module-dropdown-outside" 
                 DataSourceID="sqlModules" DataTextField="Title" DataValueField="ID" OnDataBound="ddlModules_DataBound" />
+            <div style="margin-left: auto; display: flex; gap: 10px;">
+                <a href="Rank.aspx" class="btn btn-success" style="padding: 10px 20px; font-weight: 600;">
+                    🏆 Leaderboard
+                </a>
+                <asp:Panel ID="divCreateQuiz" runat="server">
+                    <a href="CreateQuiz.aspx" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600;">
+                        + Create Quiz
+                    </a>
+                </asp:Panel>
+            </div>
         </div>
 
         <!-- Quiz Title Section -->
