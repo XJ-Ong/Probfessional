@@ -63,24 +63,23 @@
                         <!-- Bottom Row: Nav + Session Buttons -->
                         <div class="d-flex justify-content-between align-items-center border-top pt-2">
                             <nav class="nav">
-                                <a class="nav-link fw-semibold px-3" href="#">Home</a>
+                                <a class="nav-link fw-semibold px-3" href="Default.aspx">Home</a>
                                 <a class="nav-link fw-semibold px-3" href="About.aspx">About</a>
-                                <a class="nav-link fw-semibold px-3" href="#">Modules</a>
-                                <a class="nav-link fw-semibold px-3" href="#">Quizzes</a>
-                                <a class="nav-link fw-semibold px-3" href="#">Progress</a>
+                                <a class="nav-link fw-semibold px-3" href="Modules.aspx">Modules</a>
+                                <a class="nav-link fw-semibold px-3" href="Quizzes.aspx">Quizzes</a>
+                                <a class="nav-link fw-semibold px-3" href="Progress.aspx">Progress</a>
                             </nav>
 
-                            <asp:LoginView runat="server">
-                                <AnonymousTemplate>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="btn btn-outline-secondary" />
-                                        <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" />
-                                    </div>
-                                </AnonymousTemplate>
-                                <LoggedInTemplate>
-                                    <asp:ImageButton ID="btnProfile" runat="server" ImageUrl="~/Images/user-icon.png" CssClass="rounded-circle" Width="40" Height="40" />
-                                </LoggedInTemplate>
-                            </asp:LoginView>
+                            <div class="d-flex align-items-center gap-2" runat="server" id="divAuthButtons">
+                                <!-- Anonymous Users -->
+                                <asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="btn btn-outline-secondary" OnClick="btnRegister_Click" />
+                                <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" OnClick="btnLogin_Click" />
+                            </div>
+                            <!-- Logged In Users -->
+                            <div class="d-flex align-items-center gap-3" runat="server" id="divUserProfile" style="display:none;">
+                                <span id="spanUserDisplayName" runat="server" style="background: linear-gradient(135deg, #1e40af 0%, #0369a1 50%, #0891b2 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-right: 8px;"></span>
+                                <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn btn-outline-danger" OnClick="btnLogout_Click" />
+                            </div>
                         </div>
                     </div>
                 </div>
