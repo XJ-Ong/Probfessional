@@ -167,7 +167,6 @@
     <Content Include="Lessons.aspx" />
     <Content Include="CreateQuiz.aspx" />
     <Content Include="Rank.aspx" />
-    <Content Include="ClineRules.md" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
