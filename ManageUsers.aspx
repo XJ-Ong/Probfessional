@@ -12,19 +12,69 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">User Details</h5>
+                <asp:ValidationSummary ID="ValidationSummary1" runat="server" CssClass="alert alert-danger" DisplayMode="BulletList" ValidationGroup="AddUser" />
+                <asp:ValidationSummary ID="ValidationSummary2" runat="server" CssClass="alert alert-danger" DisplayMode="BulletList" ValidationGroup="UpdateUser" />
                 <table class="table table-bordered">
                     <tr>
                         <td style="width: 200px;"><asp:Label ID="lblEmail" runat="server" Text="Email:" CssClass="fw-bold" /></td>
-                        <td><asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" /></td>
+                        <td>
+                            <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" />
+                            <asp:RequiredFieldValidator ID="rfvEmailAdd" runat="server" 
+                                ControlToValidate="txtEmail" 
+                                ErrorMessage="Email is required" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="AddUser" />
+                            <asp:RequiredFieldValidator ID="rfvEmailUpdate" runat="server" 
+                                ControlToValidate="txtEmail" 
+                                ErrorMessage="Email is required" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="UpdateUser" />
+                            <asp:RegularExpressionValidator ID="revEmailAdd" runat="server" 
+                                ControlToValidate="txtEmail" 
+                                ErrorMessage="Enter a valid email address" 
+                                ValidationExpression="^\S+@\S+\.\S+$" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="AddUser" />
+                            <asp:RegularExpressionValidator ID="revEmailUpdate" runat="server" 
+                                ControlToValidate="txtEmail" 
+                                ErrorMessage="Enter a valid email address" 
+                                ValidationExpression="^\S+@\S+\.\S+$" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="UpdateUser" />
+                        </td>
                     </tr>
                     <tr>
                         <td><asp:Label ID="lblDisplayName" runat="server" Text="Display Name:" CssClass="fw-bold" /></td>
-                        <td><asp:TextBox ID="txtDisplayName" runat="server" CssClass="form-control" /></td>
+                        <td>
+                            <asp:TextBox ID="txtDisplayName" runat="server" CssClass="form-control" />
+                            <asp:RequiredFieldValidator ID="rfvDisplayNameAdd" runat="server" 
+                                ControlToValidate="txtDisplayName" 
+                                ErrorMessage="Display name is required" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="AddUser" />
+                            <asp:RequiredFieldValidator ID="rfvDisplayNameUpdate" runat="server" 
+                                ControlToValidate="txtDisplayName" 
+                                ErrorMessage="Display name is required" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="UpdateUser" />
+                        </td>
                     </tr>
                     <tr>
                         <td><asp:Label ID="lblPassword" runat="server" Text="Password:" CssClass="fw-bold" /></td>
                         <td>
                             <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" TextMode="Password" placeholder="Leave blank when updating to keep current password" />
+                            <asp:RequiredFieldValidator ID="rfvPasswordAdd" runat="server" 
+                                ControlToValidate="txtPassword" 
+                                ErrorMessage="Password is required when adding a new user" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" 
+                                ValidationGroup="AddUser" />
                         </td>
                     </tr>
                     <tr>
@@ -46,8 +96,8 @@
                     <tr>
                         <td></td>
                         <td>
-                            <asp:Button ID="btnAdd" runat="server" Text="Add User" CssClass="btn btn-success" OnClick="btnAdd_Click" />
-                            <asp:Button ID="btnUpdate" runat="server" Text="Update User" CssClass="btn btn-primary ms-2" OnClick="btnUpdate_Click" />
+                            <asp:Button ID="btnAdd" runat="server" Text="Add User" CssClass="btn btn-success" OnClick="btnAdd_Click" ValidationGroup="AddUser" />
+                            <asp:Button ID="btnUpdate" runat="server" Text="Update User" CssClass="btn btn-primary ms-2" OnClick="btnUpdate_Click" ValidationGroup="UpdateUser" />
                             <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn btn-secondary ms-2" OnClick="btnClear_Click" CausesValidation="False" />
                         </td>
                     </tr>

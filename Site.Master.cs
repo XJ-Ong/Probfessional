@@ -49,5 +49,15 @@ namespace Probfessional
             // Redirect to login page
             Response.Redirect("Login.aspx");
         }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            string searchTerm = txtSearch.Text.Trim();
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                // Redirect to search results page with query parameter
+                Response.Redirect("SearchResults.aspx?q=" + Server.UrlEncode(searchTerm));
+            }
+        }
     }
 }

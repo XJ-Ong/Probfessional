@@ -84,13 +84,9 @@ namespace Probfessional
 
         protected void btnAdd_Click(object sender, EventArgs e)
         {
-            // Validate required fields
-            if (string.IsNullOrWhiteSpace(txtEmail.Text) || 
-                string.IsNullOrWhiteSpace(txtDisplayName.Text) || 
-                string.IsNullOrWhiteSpace(txtPassword.Text))
+            // Check validation controls
+            if (!Page.IsValid)
             {
-                lblError.Visible = true;
-                lblError.Text = "Please fill in all required fields (Email, Display Name, Password).";
                 return;
             }
 
@@ -119,12 +115,9 @@ namespace Probfessional
                 return;
             }
 
-            // Validate required fields
-            if (string.IsNullOrWhiteSpace(txtEmail.Text) || 
-                string.IsNullOrWhiteSpace(txtDisplayName.Text))
+            // Check validation controls
+            if (!Page.IsValid)
             {
-                lblError.Visible = true;
-                lblError.Text = "Please fill in all required fields (Email, Display Name).";
                 return;
             }
 

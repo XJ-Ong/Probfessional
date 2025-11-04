@@ -84,8 +84,8 @@
                                 Probfessional: Exploring Probability in Parlour Games
                             </h4>
                             <div class="input-group ms-3" style="width: 240px;">
-                                <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" placeholder="Search..."></asp:TextBox>
-                                <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn btn-outline-primary" CausesValidation="False" />
+                                <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" placeholder="Search modules, lessons..." />
+                                <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn btn-outline-primary" CausesValidation="False" OnClick="btnSearch_Click" />
                             </div>
                         </div>
 

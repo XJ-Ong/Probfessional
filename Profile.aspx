@@ -12,14 +12,35 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">Profile Information</h5>
+                <asp:ValidationSummary runat="server" CssClass="alert alert-danger" DisplayMode="BulletList" />
                 <table class="table table-bordered">
                     <tr>
                         <td><asp:Label ID="lblEmail" runat="server" Text="Email:" CssClass="fw-bold" /></td>
-                        <td><asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" /></td>
+                        <td>
+                            <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" />
+                            <asp:RequiredFieldValidator ID="rfvEmail" runat="server" 
+                                ControlToValidate="txtEmail" 
+                                ErrorMessage="Email is required" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" />
+                            <asp:RegularExpressionValidator ID="revEmail" runat="server" 
+                                ControlToValidate="txtEmail" 
+                                ErrorMessage="Enter a valid email address" 
+                                ValidationExpression="^\S+@\S+\.\S+$" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" />
+                        </td>
                     </tr>
                     <tr>
                         <td><asp:Label ID="lblDisplayName" runat="server" Text="Display Name:" CssClass="fw-bold" /></td>
-                        <td><asp:TextBox ID="txtDisplayName" runat="server" CssClass="form-control" /></td>
+                        <td>
+                            <asp:TextBox ID="txtDisplayName" runat="server" CssClass="form-control" />
+                            <asp:RequiredFieldValidator ID="rfvDisplayName" runat="server" 
+                                ControlToValidate="txtDisplayName" 
+                                ErrorMessage="Display name is required" 
+                                Display="Dynamic" 
+                                CssClass="text-danger" />
+                        </td>
                     </tr>
                     <tr>
                         <td><asp:Label ID="lblPassword" runat="server" Text="New Password:" CssClass="fw-bold" /></td>

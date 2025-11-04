@@ -11,6 +11,12 @@ namespace Probfessional
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["Role"] != null && Session["Role"].ToString() == "Admin")
+            {
+                // User is admin - redirect to Admin page
+                Response.Redirect("~/Admin.aspx");
+            }
+
             // Update Get Started button based on login status
             if (Session["UserID"] != null)
             {
