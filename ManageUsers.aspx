@@ -75,6 +75,7 @@
                                 Display="Dynamic" 
                                 CssClass="text-danger" 
                                 ValidationGroup="AddUser" />
+                            <asp:Label ID="lblStoredPassword" runat="server" Visible="False"></asp:Label>
                         </td>
                     </tr>
                     <tr>
@@ -98,6 +99,7 @@
                         <td>
                             <asp:Button ID="btnAdd" runat="server" Text="Add User" CssClass="btn btn-success" OnClick="btnAdd_Click" ValidationGroup="AddUser" />
                             <asp:Button ID="btnUpdate" runat="server" Text="Update User" CssClass="btn btn-primary ms-2" OnClick="btnUpdate_Click" ValidationGroup="UpdateUser" />
+                            <asp:Button ID="btnDelete" runat="server" Text="Delete User" CssClass="btn btn-danger ms-2" OnClick="btnDelete_Click" CausesValidation="False" />
                             <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn btn-secondary ms-2" OnClick="btnClear_Click" CausesValidation="False" />
                         </td>
                     </tr>
@@ -108,9 +110,10 @@
         <!-- SqlDataSource for CRUD Operations -->
         <asp:SqlDataSource ID="SqlDataSource1" runat="server"
             ConnectionString="<%$ ConnectionStrings:DefaultConnection %>"
-            SelectCommand="SELECT [ID], [Email], [DisplayName], [Role], [CreatedAt], [IsActive] FROM [Users] ORDER BY [CreatedAt] DESC"
+            SelectCommand="SELECT [ID], [Email], [DisplayName], [Password], [Role], [CreatedAt], [IsActive] FROM [Users] ORDER BY [CreatedAt] DESC"
             InsertCommand="INSERT INTO [Users] ([Email], [DisplayName], [Password], [Role], [CreatedAt], [IsActive]) VALUES (@Email, @DisplayName, @Password, @Role, GETDATE(), @IsActive)"
-            UpdateCommand="UPDATE [Users] SET [Email] = @Email, [DisplayName] = @DisplayName, [Password] = @Password, [Role] = @Role, [IsActive] = @IsActive WHERE [ID] = @ID">
+            UpdateCommand="UPDATE [Users] SET [Email] = @Email, [DisplayName] = @DisplayName, [Role] = @Role, [IsActive] = @IsActive WHERE [ID] = @ID"
+            DeleteCommand="DELETE FROM [Users] WHERE [ID] = @ID">
             <InsertParameters>
                 <asp:ControlParameter ControlID="txtEmail" Name="Email" PropertyName="Text" Type="String" />
                 <asp:ControlParameter ControlID="txtDisplayName" Name="DisplayName" PropertyName="Text" Type="String" />
@@ -121,11 +124,13 @@
             <UpdateParameters>
                 <asp:ControlParameter ControlID="txtEmail" Name="Email" PropertyName="Text" Type="String" />
                 <asp:ControlParameter ControlID="txtDisplayName" Name="DisplayName" PropertyName="Text" Type="String" />
-                <asp:ControlParameter ControlID="txtPassword" Name="Password" PropertyName="Text" Type="String" />
                 <asp:ControlParameter ControlID="ddlRole" Name="Role" PropertyName="SelectedValue" Type="String" />
                 <asp:ControlParameter ControlID="chkIsActive" Name="IsActive" PropertyName="Checked" Type="Boolean" />
                 <asp:SessionParameter Name="ID" SessionField="SelectedUserID" Type="Int32" />
             </UpdateParameters>
+            <DeleteParameters>
+                <asp:SessionParameter Name="ID" SessionField="SelectedUserID" Type="Int32" />
+            </DeleteParameters>
         </asp:SqlDataSource>
 
         <!-- GridView for Display -->
@@ -138,10 +143,18 @@
                     AllowPaging="True"
                     PageSize="10"
                     AllowSorting="True"
+                    AutoGenerateColumns="False"
                     OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
                     CssClass="table table-striped table-bordered">
                     <Columns>
                         <asp:CommandField ShowSelectButton="True" ButtonType="Button" SelectText="Select" />
+                        <asp:BoundField DataField="ID" HeaderText="ID" ReadOnly="True" SortExpression="ID" />
+                        <asp:BoundField DataField="Email" HeaderText="Email" SortExpression="Email" />
+                        <asp:BoundField DataField="DisplayName" HeaderText="Display Name" SortExpression="DisplayName" />
+                        <asp:BoundField DataField="Password" HeaderText="Password" SortExpression="Password" Visible="False" />
+                        <asp:BoundField DataField="Role" HeaderText="Role" SortExpression="Role" />
+                        <asp:BoundField DataField="IsActive" HeaderText="Active" SortExpression="IsActive" />
+                        <asp:BoundField DataField="CreatedAt" HeaderText="Created At" SortExpression="CreatedAt" DataFormatString="{0:yyyy-MM-dd}" />
                     </Columns>
                 </asp:GridView>
             </div>
