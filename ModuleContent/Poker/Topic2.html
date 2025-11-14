@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h2>Probability of Drawing Specific Cards</h2>
+    <p>In poker, understanding the probability of drawing specific cards is fundamental to making strategic decisions. Each card drawn changes the remaining deck composition.</p>
+    <img src="/ImgModule/poker.jpg" alt="Poker card drawing" class="img-fluid mb-3" style="max-width:300px;"/>
+    <h3>Single Card Draws</h3>
+    <ul>
+        <li><strong>Ace:</strong> P(Ace) = 4/52 = 1/13 ≈ 7.69%</li>
+        <li><strong>Red Card:</strong> P(red) = 26/52 = 1/2 = 50%</li>
+        <li><strong>Heart:</strong> P(heart) = 13/52 = 1/4 = 25%</li>
+        <li><strong>Face Card:</strong> P(face card) = 12/52 = 3/13 ≈ 23.08%</li>
+    </ul>
+    <h3>Multiple Card Scenarios</h3>
+    <ul>
+        <li>P(first two cards both spades) = (13/52) × (12/51) ≈ 5.88%</li>
+        <li>P(king and queen in two draws) = 2 × (4/52) × (4/51) ≈ 1.21%</li>
+        <li>P(at least one Ace in two cards) = 1 - P(no Aces) = 1 - (48/52)×(47/51) ≈ 14.93%</li>
+    </ul>
+    <h3>Color and Suit Probabilities</h3>
+    <ul>
+        <li>P(black card) = P(black) = 26/52 = 1/2 = 50%</li>
+        <li>P(specific suit) = 13/52 = 1/4 = 25% for any suit</li>
+        <li>P(same color in two draws) = (26/52) × (25/51) ≈ 24.51%</li>
+    </ul>
+    <p><strong>Key Point:</strong> Probabilities change with each card drawn - the deck gets smaller!</p>
+</body>
+</html>

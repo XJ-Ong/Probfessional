@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h3>Poker Hands: Flushes, Straights, and Full Houses</h3>
+    <p><strong>Flush (all same suit):</strong></p>
+    <ul>
+        <li>Ways to choose 5 cards from 13 of same suit: C(13,5)</li>
+        <li>Total ways to choose 5 cards: C(52,5)</li>
+        <li>P(flush) = 4 × C(13,5) / C(52,5) ≈ 1/508</li>
+    </ul>
+    <p><strong>Straight (5 consecutive ranks):</strong></p>
+    <ul>
+        <li>10 possible straights (A-5 through 10-A)</li>
+        <li>Each can be any suit: 4⁵ = 1024 ways</li>
+        <li>P(straight) ≈ 1/254</li>
+    </ul>
+    <p><strong>Full House (3 of one rank, 2 of another):</strong></p>
+    <ul>
+        <li>13 ways to choose rank for triple, 12 ways for pair</li>
+        <li>P(full house) ≈ 1/693</li>
+    </ul>
+    <p><strong>No Pairs:</strong> P(no pairs in 5 cards) ≈ 0.504</p>
+    <p><strong>Practice:</strong></p>
+    <ul>
+        <li>P(flush) ≈ 1/508</li>
+        <li>P(straight) ≈ 1/254</li>
+        <li>P(full house) ≈ 1/693</li>
+        <li>P(no pairs) ≈ 0.504</li>
+    </ul>
+</body>
+</html>

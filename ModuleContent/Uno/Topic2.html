@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h2>Color Matching Probabilities in UNO</h2>
+    <p>UNO''s color-matching mechanic introduces conditional probability concepts. The probability of matching depends on what card is currently in play and what cards remain in the deck.</p>
+    <img src="/ImgModule/uno.png"alt="UNO color matching"class="img-fluid mb-3"style="max-width:300px;"/>
+    <h3>Color Matching Basics</h3>
+    <ul>
+        <li>P(matching red if red is in play) depends on remaining red cards</li>
+        <li>If 20 red cards remain from 90 total, P(red) = 20/90 ≈ 22.2%</li>
+        <li>P(matching current color) changes as game progresses</li>
+    </ul>
+    <h3>Strategic Probability</h3>
+    <ul>
+        <li>Playing a color change affects opponent''s matching probability</li>
+        <li>If opponent has 7 cards, P(they can play) ≈ 1/4 if colors are balanced</li>
+        <li>Wild cards can change probability landscape instantly</li>
+    </ul>
+    <h3>Conditional Probability</h3>
+    <ul>
+        <li>P(drawing red | red is current color) depends on deck state</li>
+        <li>P(opponent can play | they have N cards) requires deck analysis</li>
+        <li>Probability updates with each card played</li>
+    </ul>
+    <p><strong>Tip:</strong> Track played cards to improve probability estimates!</p>
+</body>
+</html>

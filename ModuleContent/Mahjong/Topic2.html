@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h2>Understanding Sampling Without Replacement</h2>
+    <p>Mahjong demonstrates a crucial probability concept: sampling without replacement. Unlike dice where each roll is independent, Mahjong tiles are removed from the deck once drawn, affecting all subsequent probabilities.</p>
+    <img src="/ImgModule/mahjong.jpeg" alt="Mahjong tiles distribution" class="img-fluid mb-3" style="max-width:300px;"/>
+    <h3>How It Works</h3>
+    <ul>
+        <li><strong>Initial Probability:</strong> P(bamboo tile) = 36/144 = 1/4 at start</li>
+        <li><strong>After Drawing One:</strong> P(bamboo) = 35/143 if first was bamboo, or 36/143 if first was not</li>
+        <li>Each draw changes the remaining pool and probabilities</li>
+    </ul>
+    <h3>Consecutive Draws</h3>
+    <ul>
+        <li>P(drawing two bamboo tiles in a row) = (36/144) × (35/143) ≈ 0.0616</li>
+        <li>P(drawing dragon then flower) = (12/144) × (8/143) ≈ 0.0047</li>
+        <li>Order matters in these calculations!</li>
+    </ul>
+    <h3>Strategic Implications</h3>
+    <ul>
+        <li>As tiles are drawn, probabilities update continuously</li>
+        <li>Players must recalculate odds throughout the game</li>
+        <li>Knowing which tiles have been played affects future draws</li>
+    </ul>
+    <p><strong>Application:</strong> This concept applies to many card games and real-world sampling scenarios!</p>
+</body>
+</html>

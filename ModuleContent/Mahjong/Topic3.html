@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h2>Mahjong Tile Categories and Their Probabilities</h2>
+    <p>Understanding the distribution of tile categories in Mahjong is essential for calculating probabilities accurately. Each category has different counts, affecting their individual probabilities.</p>
+    <img src="/ImgModule/mahjong.jpeg" alt="Mahjong categories" class="img-fluid mb-3" style="max-width:300px;"/>
+    <h3>Major Categories</h3>
+    <ul>
+        <li><strong>Suit Tiles:</strong> Bamboo, Character, Dot (36 each = 108 total)</li>
+        <li>Each suit has probability 36/144 = 1/4 = 25%</li>
+        <li><strong>Honor Tiles:</strong> Dragons (12) + Winds (16) = 28 total</li>
+        <li><strong>Special Tiles:</strong> Flowers (8 tiles = 1/18 probability)</li>
+    </ul>
+    <h3>Calculating Specific Probabilities</h3>
+    <ul>
+        <li>P(specific suit, e.g., bamboo) = 36/144 = 1/4</li>
+        <li>P(dragon tile) = 12/144 = 1/12 ≈ 8.33%</li>
+        <li>P(wind tile) = 16/144 = 1/9 ≈ 11.11%</li>
+        <li>P(flower tile) = 8/144 = 1/18 ≈ 5.56%</li>
+    </ul>
+    <h3>Combined Probabilities</h3>
+    <ul>
+        <li>P(any suit tile) = 108/144 = 3/4 = 75%</li>
+        <li>P(honor or flower) = (28 + 8)/144 = 36/144 = 1/4 = 25%</li>
+        <li>P(NOT a flower) = 136/144 = 17/18 ≈ 94.44%</li>
+    </ul>
+    <p><strong>Remember:</strong> Probabilities must add up to 100% when considering all possible outcomes!</p>
+</body>
+</html>

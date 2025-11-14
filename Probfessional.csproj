@@ -104,7 +104,7 @@
     <Content Include="App_Data\Probfessional_log.ldf">
       <DependentUpon>Probfessional.mdf</DependentUpon>
     </Content>
-    <Content Include="App_Data\schema.sql" />
+    <Content Include="App_Data\database.sql" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -126,6 +126,36 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="ModuleContent\Dice\Topic1.html" />
+    <Content Include="ModuleContent\Dice\Topic2.html" />
+    <Content Include="ModuleContent\Dice\Topic3.html" />
+    <Content Include="ModuleContent\Dice\Topic4.html" />
+    <Content Include="ModuleContent\Dice\Topic5.html" />
+    <Content Include="ModuleContent\Dice\Topic6.html" />
+    <Content Include="ModuleContent\Mahjong\Topic1.html" />
+    <Content Include="ModuleContent\Mahjong\Topic2.html" />
+    <Content Include="ModuleContent\Mahjong\Topic3.html" />
+    <Content Include="ModuleContent\Mahjong\Topic4.html" />
+    <Content Include="ModuleContent\Mahjong\Topic5.html" />
+    <Content Include="ModuleContent\Mahjong\Topic6.html" />
+    <Content Include="ModuleContent\Poker\Topic1.html" />
+    <Content Include="ModuleContent\Poker\Topic2.html" />
+    <Content Include="ModuleContent\Poker\Topic3.html" />
+    <Content Include="ModuleContent\Poker\Topic4.html" />
+    <Content Include="ModuleContent\Poker\Topic5.html" />
+    <Content Include="ModuleContent\Poker\Topic6.html" />
+    <Content Include="ModuleContent\SlotMachine\Topic1.html" />
+    <Content Include="ModuleContent\SlotMachine\Topic2.html" />
+    <Content Include="ModuleContent\SlotMachine\Topic3.html" />
+    <Content Include="ModuleContent\SlotMachine\Topic4.html" />
+    <Content Include="ModuleContent\SlotMachine\Topic5.html" />
+    <Content Include="ModuleContent\SlotMachine\Topic6.html" />
+    <Content Include="ModuleContent\Uno\Topic1.html" />
+    <Content Include="ModuleContent\Uno\Topic2.html" />
+    <Content Include="ModuleContent\Uno\Topic3.html" />
+    <Content Include="ModuleContent\Uno\Topic4.html" />
+    <Content Include="ModuleContent\Uno\Topic5.html" />
+    <Content Include="ModuleContent\Uno\Topic6.html" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />

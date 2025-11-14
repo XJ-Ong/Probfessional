@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.IO;
 
 namespace Probfessional
 {
@@ -19,45 +20,52 @@ namespace Probfessional
                 Response.Redirect("Login.aspx");
                 return;
             }
-
             if (!IsPostBack)
             {
                 LoadLesson();
             }
         }
-
         private void LoadLesson()
         {
             string lessonId = Request.QueryString["id"];
-            
+
             if (string.IsNullOrEmpty(lessonId))
             {
                 lblError.Visible = true;
                 lblError.Text = "No lesson specified.";
                 return;
             }
-
             // Step 2: Create connection
             string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             SqlConnection conn = new SqlConnection(connStr);
             int moduleId = 0;
-
             try
             {
                 // Step 3: Open connection
                 conn.Open();
-
                 // Step 4: Prepare SqlCommand
-                string lessonQuery = "SELECT l.ID, l.Title, l.Content, l.ModuleID FROM Lessons l WHERE l.ID = @LessonID";
+                string lessonQuery = "SELECT l.ID, l.Title, l.ContentPath, l.ModuleID FROM Lessons l WHERE l.ID = @LessonID";
                 SqlCommand comm = new SqlCommand(lessonQuery, conn);
                 comm.Parameters.AddWithValue("@LessonID", lessonId);
-
                 // Step 5: Execute reader
                 SqlDataReader reader = comm.ExecuteReader();
                 if (reader.Read())
                 {
                     lessonTitle.InnerText = reader["Title"].ToString();
-                    lessonContent.InnerHtml = reader["Content"].ToString();
+                    string contentPath = reader["ContentPath"].ToString();
+                    string physicalPath = Server.MapPath(contentPath);
+                    if (File.Exists(physicalPath))
+                    {
+                        string content = File.ReadAllText(physicalPath);
+                        lessonContent.InnerHtml = content;
+                    }
+                    else
+                    {
+                        lblError.Visible = true;
+                        lblError.Text = "Lesson content file not found.";
+                        reader.Close();
+                        return;
+                    }
                     moduleId = Convert.ToInt32(reader["ModuleID"]);
                     reader.Close();
                 }
@@ -68,12 +76,10 @@ namespace Probfessional
                     lblError.Text = "Lesson not found.";
                     return;
                 }
-
                 // Get all lessons in the module ordered by ID
                 string allLessonsQuery = "SELECT ID, Title FROM Lessons WHERE ModuleID = @ModuleID ORDER BY ID";
                 SqlCommand comm2 = new SqlCommand(allLessonsQuery, conn);
                 comm2.Parameters.AddWithValue("@ModuleID", moduleId);
-
                 SqlDataReader reader2 = comm2.ExecuteReader();
                 var lessonList = new System.Collections.Generic.List<(string ID, string Title)>();
                 while (reader2.Read())
@@ -81,24 +87,21 @@ namespace Probfessional
                     lessonList.Add((reader2["ID"].ToString(), reader2["Title"].ToString()));
                 }
                 reader2.Close();
-
                 // Find current lesson index
                 int currentIndex = lessonList.FindIndex(l => l.ID == lessonId);
-                
+
                 // Set previous button
                 if (currentIndex > 0)
                 {
                     var (prevId, prevTitle) = lessonList[currentIndex - 1];
                     prevLesson.InnerHtml = $"<a href='Lessons.aspx?id={prevId}' class='btn btn-secondary'><span>‹</span> Previous</a>";
                 }
-
                 // Set next button
                 if (currentIndex < lessonList.Count - 1)
                 {
                     var (nextId, nextTitle) = lessonList[currentIndex + 1];
                     nextLesson.InnerHtml = $"<a href='Lessons.aspx?id={nextId}' class='btn btn-primary'>Next <span>›</span></a>";
                 }
-
                 // Update user progress if logged in
                 if (Session["UserID"] != null)
                 {
@@ -117,22 +120,19 @@ namespace Probfessional
                     conn.Close();
             }
         }
-
         private void UpdateUserProgress(int moduleId)
         {
             string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             SqlConnection conn = new SqlConnection(connStr);
-
             try
             {
                 conn.Open();
                 int userId = Convert.ToInt32(Session["UserID"]);
-                
+
                 // Get all lesson IDs ordered by ID
                 string lessonQuery = "SELECT ID FROM Lessons WHERE ModuleID = @ModuleID ORDER BY ID";
                 SqlCommand comm = new SqlCommand(lessonQuery, conn);
                 comm.Parameters.AddWithValue("@ModuleID", moduleId);
-
                 SqlDataReader reader = comm.ExecuteReader();
                 var lessonIds = new List<int>();
                 while (reader.Read())
@@ -140,30 +140,25 @@ namespace Probfessional
                     lessonIds.Add(Convert.ToInt32(reader["ID"]));
                 }
                 reader.Close();
-
                 // Get the current lesson ID
                 string currentLessonId = Request.QueryString["id"];
                 if (string.IsNullOrEmpty(currentLessonId))
                     return;
-
                 // Find the position of the current lesson
                 int currentIndex = lessonIds.IndexOf(Convert.ToInt32(currentLessonId));
                 decimal progressPercent = 0;
-
                 if (lessonIds.Count > 0)
                 {
                     progressPercent = ((decimal)(currentIndex + 1) / lessonIds.Count) * 100;
                 }
-
                 // Check if UserProgress entry exists
                 string checkQuery = "SELECT ID FROM UserProgress WHERE UserID = @UserID AND ModuleID = @ModuleID";
                 SqlCommand comm2 = new SqlCommand(checkQuery, conn);
                 comm2.Parameters.AddWithValue("@UserID", userId);
                 comm2.Parameters.AddWithValue("@ModuleID", moduleId);
                 object result = comm2.ExecuteScalar();
-                
-                int progressId = result != null ? Convert.ToInt32(result) : 0;
 
+                int progressId = result != null ? Convert.ToInt32(result) : 0;
                 // Update or insert UserProgress
                 if (progressId > 0)
                 {
