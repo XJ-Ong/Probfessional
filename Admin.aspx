@@ -7,7 +7,6 @@
         
         <asp:Label ID="lblError" runat="server" CssClass="alert alert-danger" Visible="false" />
 
-        <!-- Welcome Card -->
         <div class="card bg-primary text-white mb-4">
             <div class="card-body">
                 <h4>Welcome, <asp:Label ID="lblAdminName" runat="server" /></h4>
@@ -15,7 +14,6 @@
             </div>
         </div>
 
-        <!-- Management Button -->
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">User Management</h5>
@@ -24,13 +22,11 @@
             </div>
         </div>
 
-        <!-- Quiz Attempts Log -->
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Quiz Attempt Logs</h5>
                 <p class="text-muted">View all quiz attempts by users, including date, time, quiz details, and scores.</p>
                 
-                <!-- SqlDataSource for Quiz Attempts -->
                 <asp:SqlDataSource ID="SqlDataSourceQuizAttempts" runat="server"
                     ConnectionString="<%$ ConnectionStrings:DefaultConnection %>"
                     SelectCommand="SELECT 
@@ -49,7 +45,6 @@
                     ORDER BY qa.TakenTime DESC">
                 </asp:SqlDataSource>
 
-                <!-- GridView for Quiz Attempts -->
                 <asp:GridView ID="GridViewQuizAttempts" runat="server"
                     DataSourceID="SqlDataSourceQuizAttempts"
                     AllowPaging="True"
