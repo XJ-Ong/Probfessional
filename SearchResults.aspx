@@ -1,7 +1,5 @@
 <%@ Page Title="Search Results" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="SearchResults.aspx.cs" Inherits="Probfessional.SearchResults" %>
-
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-
     <div class="container mt-4">
         <h2 class="mb-4">Search Results</h2>
 
@@ -36,13 +34,10 @@
                             <p class="text-muted mb-2">
                                 <small>Module: <%# Eval("ModuleTitle") %></small>
                             </p>
-                            <p class="card-text"><%# TruncateContent(Eval("Content").ToString(), 200) %></p>
                         </div>
                     </div>
                 </ItemTemplate>
             </asp:Repeater>
         </asp:Panel>
     </div>
-
 </asp:Content>
-
