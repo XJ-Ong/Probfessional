@@ -15,7 +15,6 @@ namespace Probfessional
             {
             }
 
-            // Check if user is logged in
             if (Session["UserID"] == null)
             {
                 Response.Redirect("Login.aspx");

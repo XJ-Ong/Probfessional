@@ -97,9 +97,10 @@ VALUES
 
 ('Slot Machines', 'slot-machines', 'Understand independent events and probability through slot machines! This module explains how probability works in gambling scenarios, focusing on independent events, expected values, and probability calculations. Learn why the house always has an edge, how to calculate payback percentages, and understand the mathematics behind slot machine outcomes. Perfect for understanding probability in real-world gambling contexts.', 'ImgModule/slot_machine.jpeg');
 
--- Module 1: Poker (6 Topics)
+
 INSERT INTO [Lessons] ([ModuleID], [Title], [ContentPath])
 VALUES
+-- Module 1: Poker (6 Topics)
 (1, 'Topic 1: Basic Poker Probability Concepts', '~/ModuleContent/Poker/Topic1.html'),
 (1, 'Topic 2: Card Drawing Probabilities', '~/ModuleContent/Poker/Topic2.html'),
 (1, 'Topic 3: Poker Hand Probabilities', '~/ModuleContent/Poker/Topic3.html'),
