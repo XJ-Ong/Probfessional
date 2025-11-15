@@ -102,7 +102,6 @@ namespace Probfessional
             if (string.IsNullOrEmpty(content))
                 return "";
 
-            // Remove HTML tags for display
             string plainText = System.Text.RegularExpressions.Regex.Replace(content, "<.*?>", "");
             
             if (plainText.Length <= maxLength)

@@ -11,20 +11,20 @@ namespace Probfessional
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check if user is logged in and update navigation
             if (Session["UserID"] != null)
             {
-                // User is logged in - show profile and logout
                 divAuthButtons.Visible = false;
                 divUserProfile.Visible = true;
-                
-                // Display user's display name in the oval badge
-                string displayName = Session["DisplayName"]?.ToString() ?? "User";
+
+                string displayName = "User";
+                if (Session["DisplayName"] != null)
+                {
+                    displayName = Session["DisplayName"].ToString();
+                }
                 spanUserDisplayName.InnerText = displayName;
             }
             else
             {
-                // User is not logged in - show register and login buttons
                 divAuthButtons.Visible = true;
                 divUserProfile.Visible = false;
             }
@@ -42,11 +42,8 @@ namespace Probfessional
 
         protected void btnLogout_Click(object sender, EventArgs e)
         {
-            // Clear session
             Session.Clear();
             Session.Abandon();
-            
-            // Redirect to login page
             Response.Redirect("Login.aspx");
         }
 
@@ -55,7 +52,6 @@ namespace Probfessional
             string searchTerm = txtSearch.Text.Trim();
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                // Redirect to search results page with query parameter
                 Response.Redirect("SearchResults.aspx?q=" + Server.UrlEncode(searchTerm));
             }
         }
