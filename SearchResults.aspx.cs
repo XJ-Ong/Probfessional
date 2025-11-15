@@ -59,15 +59,7 @@ namespace Probfessional
                 }
 
                 // Search in Lessons
-                string lessonQuery = @"
-                    SELECT 
-                        l.ID as LessonID, 
-                        l.Title as LessonTitle, 
-                        l.Content, 
-                        m.Title as ModuleTitle
-                    FROM Lessons l
-                    INNER JOIN Modules m ON l.ModuleID = m.ID
-                    WHERE l.Title LIKE @SearchTerm OR l.Content LIKE @SearchTerm";
+                string lessonQuery = @"SELECT l.ID as LessonID, l.Title as LessonTitle, l.Content, m.Title as ModuleTitle FROM Lessons l INNER JOIN Modules m ON l.ModuleID = m.ID WHERE l.Title LIKE @SearchTerm OR l.Content LIKE @SearchTerm";
                 
                 SqlCommand commLessons = new SqlCommand(lessonQuery, conn);
                 commLessons.Parameters.AddWithValue("@SearchTerm", "%" + searchTerm + "%");

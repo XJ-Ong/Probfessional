@@ -8,7 +8,6 @@
         <asp:Label ID="lblSearchQuery" runat="server" CssClass="lead mb-3" />
         <asp:Label ID="lblNoResults" runat="server" CssClass="alert alert-info" Visible="false" />
 
-        <!-- Modules Results -->
         <asp:Panel ID="pnlModules" runat="server" Visible="false" CssClass="mb-5">
             <h4 class="text-primary mb-3">Modules</h4>
             <asp:Repeater ID="rptModules" runat="server">
@@ -25,7 +24,6 @@
             </asp:Repeater>
         </asp:Panel>
 
-        <!-- Lessons Results -->
         <asp:Panel ID="pnlLessons" runat="server" Visible="false" CssClass="mb-5">
             <h4 class="text-primary mb-3">Lessons</h4>
             <asp:Repeater ID="rptLessons" runat="server">
