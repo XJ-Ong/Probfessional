@@ -51,6 +51,24 @@ namespace Probfessional
         protected global::System.Web.UI.WebControls.TextBox txtEmail;
 
         /// <summary>
+        /// rfvEmail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvEmail;
+
+        /// <summary>
+        /// revEmail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revEmail;
+
+        /// <summary>
         /// lblDisplayName control.
         /// </summary>
         /// <remarks>
@@ -69,67 +87,75 @@ namespace Probfessional
         protected global::System.Web.UI.WebControls.TextBox txtDisplayName;
 
         /// <summary>
+        /// rfvDisplayName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvDisplayName;
+
+        /// <summary>
         /// lblPassword control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-            protected global::System.Web.UI.WebControls.Label lblPassword;
+        protected global::System.Web.UI.WebControls.Label lblPassword;
 
-            /// <summary>
-            /// txtPassword control.
-            /// </summary>
-            /// <remarks>
-            /// Auto-generated field.
-            /// To modify move field declaration from designer file to code-behind file.
-            /// </remarks>
-            protected global::System.Web.UI.WebControls.TextBox txtPassword;
+        /// <summary>
+        /// txtPassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPassword;
 
-            /// <summary>
-            /// lblRole control.
-            /// </summary>
-            /// <remarks>
-            /// Auto-generated field.
-            /// To modify move field declaration from designer file to code-behind file.
-            /// </remarks>
-            protected global::System.Web.UI.WebControls.Label lblRole;
+        /// <summary>
+        /// lblRole control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRole;
 
-            /// <summary>
-            /// lblRoleDisplay control.
-            /// </summary>
-            /// <remarks>
-            /// Auto-generated field.
-            /// To modify move field declaration from designer file to code-behind file.
-            /// </remarks>
-            protected global::System.Web.UI.WebControls.Label lblRoleDisplay;
+        /// <summary>
+        /// lblRoleDisplay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRoleDisplay;
 
-            /// <summary>
-            /// lblActiveStatus control.
-            /// </summary>
-            /// <remarks>
-            /// Auto-generated field.
-            /// To modify move field declaration from designer file to code-behind file.
-            /// </remarks>
-            protected global::System.Web.UI.WebControls.Label lblActiveStatus;
+        /// <summary>
+        /// lblActiveStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblActiveStatus;
 
-            /// <summary>
-            /// btnUpdate control.
-            /// </summary>
-            /// <remarks>
-            /// Auto-generated field.
-            /// To modify move field declaration from designer file to code-behind file.
-            /// </remarks>
-            protected global::System.Web.UI.WebControls.Button btnUpdate;
+        /// <summary>
+        /// btnUpdate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpdate;
 
-            /// <summary>
-            /// btnDeactivate control.
-            /// </summary>
-            /// <remarks>
-            /// Auto-generated field.
-            /// To modify move field declaration from designer file to code-behind file.
-            /// </remarks>
-            protected global::System.Web.UI.WebControls.Button btnDeactivate;
+        /// <summary>
+        /// btnDeactivate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeactivate;
     }
 }
-

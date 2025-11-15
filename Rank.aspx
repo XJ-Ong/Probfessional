@@ -6,7 +6,6 @@
         <h2 class="mb-4 text-center">Quiz Rankings</h2>
         <p class="text-center mb-4">Top 100 players per module</p>
         
-        <!-- Module Selection -->
         <div class="mb-4">
             <table class="table">
                 <tr>
@@ -19,7 +18,6 @@
             </table>
         </div>
         
-        <!-- Rankings Table -->
         <asp:Repeater ID="rptRankings" runat="server">
             <HeaderTemplate>
                 <table class="table table-striped table-bordered">

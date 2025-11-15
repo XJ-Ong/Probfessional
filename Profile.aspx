@@ -17,7 +17,7 @@
                     <tr>
                         <td><asp:Label ID="lblEmail" runat="server" Text="Email:" CssClass="fw-bold" /></td>
                         <td>
-                            <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" />
+                            <asp:TextBox ID="txtEmail" Enabled="false" runat="server" CssClass="form-control" TextMode="Email" />
                             <asp:RequiredFieldValidator ID="rfvEmail" runat="server" 
                                 ControlToValidate="txtEmail" 
                                 ErrorMessage="Email is required" 
