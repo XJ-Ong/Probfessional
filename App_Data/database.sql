@@ -74,10 +74,6 @@ CREATE TABLE [dbo].[UserProgress] (
     CONSTRAINT [FK_UserProgress_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([ID]) ON DELETE CASCADE
 );
 
--- =============================================
--- Insert Sample Data
--- =============================================
-
 INSERT INTO [dbo].[Users] ([Email], [DisplayName], [Password], [Role], [CreatedAt], [IsActive])
 VALUES
     ('admin@gmail.com', 'admin', 'Admin123!', 'Admin', GETDATE(), 1),
@@ -141,10 +137,6 @@ VALUES
 (5, 'Topic 6: At Least One and Repeated Trials', '~/ModuleContent/SlotMachine/Topic6.html');
 GO
 
--- =============================================
--- Insert Quizzes
--- =============================================
-
 INSERT INTO [dbo].[Quiz] ([ModuleID], [Title])
 VALUES
     (1, 'Poker Probability Quiz'),
@@ -153,10 +145,6 @@ VALUES
     (4, 'Dice Probability Quiz'),
     (5, 'Slot Machines Probability Quiz');
 GO
-
--- =============================================
--- Insert Quiz Questions
--- =============================================
 
 INSERT INTO [QuizQuestion]
 ([QuizID], [QuestionText], [ChoiceA], [ChoiceB], [ChoiceC], [ChoiceD], [CorrectChoice])
